@@ -30,9 +30,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount', 
     
     'accounts.apps.AccountsConfig',
-    'audit.apps.AuditConfig',
     'dashboard.apps.DashboardConfig',
-    'config.apps.ConfigConfig',
     
     #3rd party apps
     "debug_toolbar",
@@ -54,7 +52,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'audit.middleware.NavigationTrackingMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 ]
 

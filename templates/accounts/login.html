@@ -1,114 +1,623 @@
 {% load static %}
 
-
 <!DOCTYPE html>
 <html lang="en">
-
-<!-- Mirrored from adminlte.io/themes/v3/pages/examples/login.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 08 May 2025 08:26:37 GMT -->
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AdminLTE 3 | Log in</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="Engineering Analytics Platform — Multi-discipline performance management.">
+  <link rel="icon" href="{% static 'assets/images/logo.png' %}" type="image/png" />
+  <title>EngineIQ | Sign In</title>
 
-  <!-- Google Font: Source Sans Pro -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&amp;display=fallback">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
-  <!-- icheck bootstrap -->
-  <link rel="stylesheet" href="{% static 'plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="{% static 'dist/css/adminlte.min2167.css' %}">
-  <script data-cfasync="false" nonce="21d51f4b-a16b-473f-9a70-20b6504347bc">try{(function(w,d){!function(bj,bk,bl,bm){if(bj.zaraz)console.error("zaraz is loaded twice");else{bj[bl]=bj[bl]||{};bj[bl].executed=[];bj.zaraz={deferred:[],listeners:[]};bj.zaraz._v="5852";bj.zaraz._n="21d51f4b-a16b-473f-9a70-20b6504347bc";bj.zaraz.q=[];bj.zaraz._f=function(bn){return async function(){var bo=Array.prototype.slice.call(arguments);bj.zaraz.q.push({m:bn,a:bo})}};for(const bp of["track","set","debug"])bj.zaraz[bp]=bj.zaraz._f(bp);bj.zaraz.init=()=>{var bq=bk.getElementsByTagName(bm)[0],br=bk.createElement(bm),bs=bk.getElementsByTagName("title")[0];bs&&(bj[bl].t=bk.getElementsByTagName("title")[0].text);bj[bl].x=Math.random();bj[bl].w=bj.screen.width;bj[bl].h=bj.screen.height;bj[bl].j=bj.innerHeight;bj[bl].e=bj.innerWidth;bj[bl].l=bj.location.href;bj[bl].r=bk.referrer;bj[bl].k=bj.screen.colorDepth;bj[bl].n=bk.characterSet;bj[bl].o=(new Date).getTimezoneOffset();if(bj.dataLayer)for(const bt of Object.entries(Object.entries(dataLayer).reduce(((bu,bv)=>({...bu[1],...bv[1]})),{})))zaraz.set(bt[0],bt[1],{scope:"page"});bj[bl].q=[];for(;bj.zaraz.q.length;){const bw=bj.zaraz.q.shift();bj[bl].q.push(bw)}br.defer=!0;for(const bx of[localStorage,sessionStorage])Object.keys(bx||{}).filter((bz=>bz.startsWith("_zaraz_"))).forEach((by=>{try{bj[bl]["z_"+by.slice(7)]=JSON.parse(bx.getItem(by))}catch{bj[bl]["z_"+by.slice(7)]=bx.getItem(by)}}));br.referrerPolicy="origin";br.src="https://adminlte.io/cdn-cgi/zaraz/s.js?z="+btoa(encodeURIComponent(JSON.stringify(bj[bl])));bq.parentNode.insertBefore(br,bq)};["complete","interactive"].includes(bk.readyState)?zaraz.init():bj.addEventListener("DOMContentLoaded",zaraz.init)}}(w,d,"zarazData","script");window.zaraz._p=async bb=>new Promise((bc=>{if(bb){bb.e&&bb.e.forEach((bd=>{try{const be=d.querySelector("script[nonce]"),bf=be?.nonce||be?.getAttribute("nonce"),bg=d.createElement("script");bf&&(bg.nonce=bf);bg.innerHTML=bd;bg.onload=()=>{d.head.removeChild(bg)};d.head.appendChild(bg)}catch(bh){console.error(`Error executing script: ${bd}\n`,bh)}}));Promise.allSettled((bb.f||[]).map((bi=>fetch(bi[0],bi[1]))))}bc()}));zaraz._p({"e":["(function(w,d){})(window,document)"]});})(window,document)}catch(e){throw fetch("/cdn-cgi/zaraz/t"),e;};</script>
-    <style>
-      input[type="password"]::-ms-reveal,
-      input[type="password"]::-ms-clear,
-      input[type="password"]::-webkit-credentials-auto-fill-button,
-      input[type="password"]::-webkit-textfield-decoration-container {
-          display: none !important;
-      }
-      input[type="password"] {
-          text-security: disc;
-      }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
-      .login-box-wide {
-        width: 480px;
-        margin: auto;
-      }
-      
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #080c12;
+      --surface:  #0d1420;
+      --border:   rgba(255,255,255,0.07);
+      --accent:   #00c2ff;
+      --accent2:  #00ffc2;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --error:    #f56565;
+      --grid:     rgba(0,194,255,0.04);
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'Syne', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: stretch;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── LEFT PANEL ── */
+    .left-panel {
+      flex: 0 0 480px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 52px 56px;
+      position: relative;
+      z-index: 10;
+      overflow: hidden;
+    }
+
+    /* Blueprint corner marks */
+    .left-panel::before,
+    .left-panel::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: var(--accent);
+      border-style: solid;
+      opacity: 0.4;
+    }
+    .left-panel::before { top: 24px; left: 24px; border-width: 1px 0 0 1px; }
+    .left-panel::after  { bottom: 24px; right: 24px; border-width: 0 1px 1px 0; }
+
+    /* ── LOGO ── */
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 64px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .logo-icon svg { width: 20px; height: 20px; }
+
+    .logo-name {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+
+    .logo-name span {
+      color: var(--accent);
+    }
+
+    /* ── FORM AREA ── */
+    .form-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .form-heading {
+      margin-bottom: 36px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    .form-heading h1 {
+      font-size: 30px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.8px;
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+
+    .form-heading p {
+      font-size: 13.5px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 300;
+      letter-spacing: 0.2px;
+    }
+
+    /* Django messages */
+    .messages-list {
+      margin-bottom: 24px;
+      animation: fadeUp 0.5s ease both;
+    }
+    .msg {
+      padding: 11px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 8px;
+      border-left: 3px solid;
+    }
+    .msg.error   { background: rgba(245,101,101,0.1); border-color: var(--error); color: #fc8181; }
+    .msg.success { background: rgba(0,255,194,0.08); border-color: var(--accent2); color: var(--accent2); }
+    .msg.warning { background: rgba(245,158,11,0.1); border-color: #f59e0b; color: #fbbf24; }
+    .msg.info    { background: rgba(0,194,255,0.08); border-color: var(--accent); color: var(--accent); }
+
+    /* ── FORM FIELDS ── */
+    form { animation: fadeUp 0.6s 0.2s ease both; }
+
+    .field {
+      margin-bottom: 22px;
+    }
+
+    .field-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .field-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .field-link {
+      font-size: 12px;
+      color: var(--accent);
+      text-decoration: none;
+      font-family: 'JetBrains Mono', monospace;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+    .field-link:hover { opacity: 1; text-decoration: underline; }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 13px 46px 13px 16px;
+      font-size: 14.5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 400;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+      -webkit-appearance: none;
+    }
+
+    .input-wrap input::placeholder { color: #334155; }
+
+    .input-wrap input:focus {
+      border-color: var(--accent);
+      background: rgba(0,194,255,0.04);
+      box-shadow: 0 0 0 3px rgba(0,194,255,0.08);
+    }
+
+    /* Eye toggle */
+    .eye-btn {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      transition: color 0.2s;
+    }
+    .eye-btn:hover { color: var(--accent); }
+    .eye-btn svg { width: 16px; height: 16px; }
+
+    /* ── SUBMIT ── */
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      border: none;
+      border-radius: 8px;
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #080c12;
+      cursor: pointer;
+      margin-top: 8px;
+      position: relative;
+      overflow: hidden;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+
+    .btn-submit::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0);
+      transition: background 0.2s;
+    }
+
+    .btn-submit:hover { opacity: 0.92; transform: translateY(-1px); }
+    .btn-submit:active { transform: translateY(0); }
+
+    /* ── DIVIDERS / DISCIPLINES ── */
+    .discipline-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 34px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .disc-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 5px 10px;
+      text-transform: uppercase;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .disc-tag:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── FOOTER ── */
+    .panel-footer {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #334155;
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+
+    .panel-footer a { color: #475569; text-decoration: none; }
+    .panel-footer a:hover { color: var(--accent); }
+
+    /* ── RIGHT VISUAL ── */
+    .right-panel {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Grid background */
+    .right-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: gridShift 20s linear infinite;
+    }
+
+    @keyframes gridShift {
+      from { background-position: 0 0; }
+      to   { background-position: 40px 40px; }
+    }
+
+    /* Glowing orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      animation: pulse 8s ease-in-out infinite;
+    }
+    .orb-1 {
+      width: 500px; height: 500px;
+      background: rgba(0,194,255,0.12);
+      top: -100px; right: -100px;
+      animation-delay: 0s;
+    }
+    .orb-2 {
+      width: 350px; height: 350px;
+      background: rgba(0,255,194,0.08);
+      bottom: -50px; left: 50px;
+      animation-delay: -4s;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.7; }
+    }
+
+    /* Central visual */
+    .vis-card {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 40px;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+
+    .vis-badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid rgba(0,194,255,0.3);
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+      background: rgba(0,194,255,0.06);
+    }
+
+    .vis-title {
+      font-size: clamp(28px, 3vw, 40px);
+      font-weight: 800;
+      line-height: 1.15;
+      color: #fff;
+      letter-spacing: -1px;
+      margin-bottom: 18px;
+      max-width: 460px;
+    }
+
+    .vis-title .accent-word { color: var(--accent); }
+
+    .vis-desc {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 380px;
+      margin: 0 auto 40px;
+    }
+
+    /* Stats row */
+    .stats-row {
+      display: flex;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    .stat {
+      flex: 1;
+      background: rgba(13,20,32,0.8);
+      padding: 20px 16px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+    }
+
+    .stat-val {
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-val span { color: var(--accent); }
+
+    .stat-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Horizontal lines (blueprint feel) */
+    .h-line {
+      position: absolute;
+      left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,194,255,0.15), transparent);
+    }
+    .h-line-1 { top: 30%; }
+    .h-line-2 { bottom: 30%; }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .right-panel { display: none; }
+      .left-panel  { flex: 1; padding: 44px 32px; }
+    }
+
+    @media (max-width: 420px) {
+      .left-panel { padding: 36px 24px; }
+    }
   </style>
 </head>
-<body class="hold-transition login-page">
-<div class="login-box login-box-wide">
 
-  <div class="login-logo">
-    <a href="../../index2.html"><b>KNOX</b>DEMO</a>
-  </div>
-  <!-- /.login-logo -->
-  <div class="card">
-    <div class="card-body login-card-body">
-      <p class="login-box-msg">Sign in to start your session</p>
+<body>
 
-      <form action="{% url 'login' %}?next={{ request.GET.next }}" class="form-validate is-alter" method="POST" autocomplete="off">
+  <!-- ── LEFT: LOGIN PANEL ── -->
+  <div class="left-panel">
+
+    <!-- Logo -->
+    <div class="logo-wrap">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080c12"/>
+          <path d="M2 17l10 5 10-5" stroke="#080c12" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M2 12l10 5 10-5" stroke="#080c12" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="logo-name">Engine<span>IQ</span></div>
+    </div>
+
+    <!-- Form Area -->
+    <div class="form-area">
+
+      <!-- Heading -->
+      <div class="form-heading">
+        <h1>Welcome back.</h1>
+        <p>// sign in to your analytics workspace</p>
+      </div>
+
+      <!-- Django Messages -->
+      {% if messages %}
+      <div class="messages-list">
+        {% for message in messages %}
+        <div class="msg {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Login Form -->
+      <form action="{% url 'login' %}?next={{ request.GET.next }}" method="POST" autocomplete="off">
         {% csrf_token %}
-                                
-        <!-- Hidden dummy inputs to prevent autofill -->
-        <input type="text" name="fakeusernameremembered" style="display:none">
-        <input type="password" name="fakepasswordremembered" style="display:none">
 
-        <div class="input-group mb-3">
-          <input autocomplete="off" type="text" class="form-control form-control-lg" required name="username" placeholder="Enter your email address or username">
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-envelope"></span>
-            </div>
+        <!-- Email / Username -->
+        <div class="field">
+          <div class="field-label-row">
+            <label class="field-label" for="username">Email or Username</label>
+          </div>
+          <div class="input-wrap">
+            <input type="text"
+                   id="username"
+                   name="username"
+                   required
+                   autocomplete="off"
+                   placeholder="you@firm.com">
           </div>
         </div>
-        <div class="input-group mb-3">
-          <input id="password" type="password" class="form-control form-control-lg" required name="password"
-          placeholder="Enter your passcode" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-lock"></span>
-            </div>
+
+        <!-- Password -->
+        <div class="field">
+          <div class="field-label-row">
+            <label class="field-label" for="password">Passcode</label>
+            <a class="field-link" href="{% url 'password_reset_request' %}" target="_blank" tabindex="-1">Forgot?</a>
+          </div>
+          <div class="input-wrap">
+            <input type="password"
+                   id="password"
+                   name="password"
+                   required
+                   autocomplete="off"
+                   autocorrect="off"
+                   autocapitalize="off"
+                   spellcheck="false"
+                   placeholder="••••••••">
+            <button type="button" class="eye-btn" id="eyeBtn" aria-label="Toggle password visibility">
+              <!-- Eye open -->
+              <svg id="iconEyeOpen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <!-- Eye closed (hidden initially) -->
+              <svg id="iconEyeClosed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
           </div>
         </div>
-        <div class="row">
-          <div class="col-8">
-            <div class="icheck-primary">
-              <input type="checkbox" id="remember">
-              <label for="remember">
-                Remember Me
-              </label>
-            </div>
-          </div>
-          <!-- /.col -->
-          <div class="col-4">
-            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
-          </div>
-          <!-- /.col -->
-        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-submit">Sign In →</button>
+
       </form>
 
-      <p class="mb-1">
-        <a href="forgot-password.html">I forgot my password</a>
-      </p>
-      <p class="mb-0">
-        <a href="register.html" class="text-center">Register a new membership</a>
-      </p>
+      <!-- Discipline Tags -->
+      <div class="discipline-tags">
+        <span class="disc-tag">Engineering</span>
+        <span class="disc-tag">Qty Surveying</span>
+        <span class="disc-tag">Land Surveying</span>
+        <span class="disc-tag">Architecture</span>
+      </div>
+
     </div>
-    <!-- /.login-card-body -->
+
+    <!-- Footer -->
+    <div class="panel-footer">
+      &copy; 2025 <a href="#">EngineIQ Analytics</a>. All rights reserved.
+    </div>
+
   </div>
-</div>
-<!-- /.login-box -->
-<script>
-  localStorage.clear();
-</script>
-<!-- jQuery -->
-<script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
-<!-- Bootstrap 4 -->
-<script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-<!-- AdminLTE App -->
-<script src="{% static 'dist/js/adminlte.min2167.js' %}"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"93c78f170c5495ed","version":"2025.4.0-1-g37f21b1","serverTiming":{"name":{"cfExtPri":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"token":"2437d112162f4ec4b63c3ca0eb38fb20","b":1}' crossorigin="anonymous"></script>
+
+  <!-- ── RIGHT: VISUAL PANEL ── -->
+  <div class="right-panel">
+    <div class="h-line h-line-1"></div>
+    <div class="h-line h-line-2"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="vis-card">
+      <div class="vis-badge">Real-Time Performance</div>
+      <h2 class="vis-title">
+        Unified analytics for<br>
+        <span class="accent-word">multi-discipline</span><br>
+        engineering firms.
+      </h2>
+      <p class="vis-desc">
+        One platform. Every discipline.<br>
+        Live project data — from field to boardroom.
+      </p>
+
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-val"><span>4</span></div>
+          <div class="stat-label">Disciplines</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val">360<span>°</span></div>
+          <div class="stat-label">Visibility</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val"><span>∞</span></div>
+          <div class="stat-label">Projects</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Password Toggle Script -->
+  <script>
+    const eyeBtn = document.getElementById('eyeBtn');
+    const pwdInput = document.getElementById('password');
+    const iconOpen = document.getElementById('iconEyeOpen');
+    const iconClosed = document.getElementById('iconEyeClosed');
+
+    eyeBtn.addEventListener('click', () => {
+      const isPassword = pwdInput.type === 'password';
+      pwdInput.type = isPassword ? 'text' : 'password';
+      iconOpen.style.display   = isPassword ? 'none' : '';
+      iconClosed.style.display = isPassword ? '' : 'none';
+    });
+  </script>
+
 </body>
 </html>
