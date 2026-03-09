@@ -41,13 +41,30 @@
                 {% comment %} <span class="nk-menu-badge">HOT</span> {% endcomment %}
               </a>
             </li>
-            <li class="nk-menu-item">
-              <a href="loan/index.html" class="nk-menu-link">
+            <li class="nk-menu-item has-sub">
+              <a href="#" class="nk-menu-link nk-menu-toggle">
                 <span class="nk-menu-icon">
-                  <em class="icon ni ni-cc-new"></em>
+                  <em class="icon ni ni-users"></em>
                 </span>
-                <span class="nk-menu-text">Loan Management Panel</span>
+                <span class="nk-menu-text">Human Resource</span>
               </a>
+              <ul class="nk-menu-sub">
+                <li class="nk-menu-item">
+                  <a href="{% url 'discipline-index' %}" class="nk-menu-link">
+                    <span class="nk-menu-text">Disciplines</span>
+                  </a>
+                </li>
+                <li class="nk-menu-item">
+                  <a href="{% url 'position-index' %}" class="nk-menu-link">
+                    <span class="nk-menu-text">Positions</span>
+                  </a>
+                </li>
+                <li class="nk-menu-item">
+                  <a href="{% url 'employee-index' %}" class="nk-menu-link">
+                    <span class="nk-menu-text">Employees</span>
+                  </a>
+                </li>
+              </ul>
             </li>
             <li class="nk-menu-item has-sub">
               <a href="#" class="nk-menu-link nk-menu-toggle">

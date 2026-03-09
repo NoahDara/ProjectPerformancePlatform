@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponseRedirect
 from django.contrib import messages
-import random
+
 
 class BranchListView(LoginRequiredMixin, SafeListView):
     model = Branch

@@ -1,0 +1,83 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Positions{% endblock title %}
+
+{% block page_title %}Positions{% endblock %}
+
+{% block page_sub_title %}Manage all positions{% endblock %}
+
+{% block actions %}
+<li class="nk-block-tools-opt">
+  <a href="{% url 'position-create' %}" class="btn btn-primary">
+    <em class="icon ni ni-plus-round"></em>
+    <span>New Position</span>
+  </a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="card card-bordered card-preview">
+  <div class="card-inner">
+    <table class="datatable-init-export nowrap table" data-export-title="Export Positions">
+      <thead>
+        <tr>
+          <th data-priority="1">Name</th>
+          <th data-priority="3">Code</th>
+          <th data-priority="4">Discipline</th>
+          <th data-priority="5">Description</th>
+          <th data-priority="6">Created</th>
+          <th data-priority="7">Status</th>
+          <th data-priority="2">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for obj in positions %}
+        <tr>
+          <td><a href="{% url 'position-detail' obj.pk %}">{{ obj.name }}</a></td>
+          <td>{{ obj.code }}</td>
+          <td>{{ obj.discipline.name }}</td>
+          <td>{{ obj.description|default:"-"|truncatechars:60 }}</td>
+          <td>{{ obj.created|date:"Y-m-d" }}</td>
+          <td>
+            {% if obj.is_active %}
+              <span class="badge bg-success">Active</span>
+            {% else %}
+              <span class="badge bg-secondary">Inactive</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{% url 'position-update' obj.pk %}" class="btn btn-dim btn-outline-primary btn-sm">Edit</a>
+            <a href="{% url 'position-toggle-active' obj.pk %}" class="btn btn-dim btn-outline-warning btn-sm">
+              {% if obj.is_active %}Deactivate{% else %}Activate{% endif %}
+            </a>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#positionDeleteModal{{ obj.pk }}" class="btn btn-dim btn-outline-danger btn-sm">Delete</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% for obj in positions %}
+<div class="modal fade" id="positionDeleteModal{{ obj.pk }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete {{ obj.name }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-warning">This action is irreversible.</p>
+        <h5>Are you sure you want to delete this position?</h5>
+      </div>
+      <div class="modal-footer bg-light justify-content-between">
+        <a href="#" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</a>
+        <a href="{% url 'position-delete' obj.pk %}" class="btn btn-outline-danger">Yes</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}
