@@ -11,6 +11,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('dashboard.urls'), name='dashboard'),
     path('accounts/', include('accounts.urls')),
+    path('branches/', include('branches.urls')),
+    path('roles/', include('roles.urls')),
     path('', RedirectView.as_view(url='/accounts/login/', permanent=False)),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

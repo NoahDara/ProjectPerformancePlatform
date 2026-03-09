@@ -5,6 +5,7 @@ from helpers.models import BaseModel
 class Branch(BaseModel):
     name = models.CharField(max_length=255)
     code = models.CharField(max_length=20, unique=True)
+    email = models.EmailField(null=True, blank=True)
     address = models.TextField(blank=True, null=True)
 
     class Meta(BaseModel.Meta):

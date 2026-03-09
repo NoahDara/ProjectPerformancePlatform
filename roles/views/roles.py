@@ -1,4 +1,3 @@
-from helpers.mixins import UIDObjectMixin
 from helpers.views import SafeListView, SafeUpdateView , SafeDeleteView, ToggleActiveView
 from ..models import Role
 from django.views.generic import TemplateView, CreateView, UpdateView, DetailView
@@ -65,7 +64,7 @@ class RoleUpdateView(LoginRequiredMixin, SafeUpdateView):
         self.object.permissions.set(permission_uids)
         return response
     
-class RoleDetailView(LoginRequiredMixin, UIDObjectMixin, DetailView):
+class RoleDetailView(LoginRequiredMixin, DetailView):
     model = Role
     template_name = "roles/detail.html"
     context_object_name = "role"

@@ -1,0 +1,83 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Branches{% endblock title %}
+
+{% block page_title %}Branches{% endblock %}
+
+{% block page_sub_title %}Manage and organize all branch locations{% endblock %}
+
+{% block actions %}
+<li class="nk-block-tools-opt">
+  <a href="{% url 'branch-create' %}" class="btn btn-primary">
+    <em class="icon ni ni-plus-round"></em>
+    <span>New Branch</span>
+  </a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="card card-bordered card-preview">
+  <div class="card-inner">
+    <table class="datatable-init-export nowrap table" data-export-title="Export Branches">
+      <thead>
+        <tr>
+          <th data-priority="1">Code</th>
+          <th data-priority="3">Name</th>
+          <th data-priority="3">Email</th>
+          <th data-priority="4">Created</th>
+          <th data-priority="5">Last Updated</th>
+          <th data-priority="6">Status</th>
+          <th data-priority="2">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for obj in branches %}
+        <tr>
+          <td>{{ obj.code }}</td>
+          <td><a href="{% url 'branch-details' obj.pk %}">{{ obj.name }}</a></td>
+          <td>{{ obj.email|default:"-" }}</td>
+          <td>{{ obj.created|date:"Y-m-d" }}</td>
+          <td>{{ obj.updated|date:"Y-m-d" }}</td>
+          <td>
+            {% if obj.is_active %}
+              <span class="badge bg-success">Active</span>
+            {% else %}
+              <span class="badge bg-secondary">Inactive</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{% url 'branch-update' obj.pk %}" class="btn btn-dim btn-outline-primary btn-sm">Edit</a>
+            <a href="{% url 'branch-toggle-active' obj.pk %}" class="btn btn-dim btn-outline-warning btn-sm">
+              {% if obj.is_active %}Deactivate{% else %}Activate{% endif %}
+            </a>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#branchDeleteModal{{ obj.pk }}" class="btn btn-dim btn-outline-danger btn-sm">Delete</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% for obj in branches %}
+<div class="modal fade" id="branchDeleteModal{{ obj.pk }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete {{ obj }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-warning">This Action is irreversible</p>
+        <h5>Are You Sure Want To Delete This Branch?</h5>
+      </div>
+      <div class="modal-footer bg-light justify-content-between">
+        <a href="#" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</a>
+        <a href="{% url 'branch-delete' obj.pk %}" class="btn btn-outline-danger">Yes</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}
