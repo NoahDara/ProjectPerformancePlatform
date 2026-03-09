@@ -1,0 +1,87 @@
+{% extends 'layouts/base.html' %}
+{% block title %}System Users{% endblock %}
+
+{% block page_title %}System Users{% endblock %}
+{% block page_sub_title %}Manage system users and their access{% endblock %}
+
+{% block actions %}
+  <li class="nk-block-tools-opt">
+    <a href="{% url "register-user" %}" class="btn btn-primary">
+      <em class="icon ni ni-plus-round"></em>
+      <span>Create User</span>
+    </a>
+  </li>
+{% endblock %}
+
+{% block content %}
+<div class="card card-bordered card-preview">
+  <div class="card-inner">
+    <table class="datatable-init-export nowrap table" data-export-title="Export">
+      <thead>
+        <tr>
+          <th data-priority="1">User Name</th>
+          <th data-priority="3">Full Name</th>
+          <th data-priority="4">User Role</th>
+          <th data-priority="5">Email</th>
+          <th data-priority="6">Is Active</th>
+          <th data-priority="7">Date Joined</th>
+          <th data-priority="2">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for obj in users %}
+        {% if obj.username != "superAdmin" %}
+        <tr>
+          <td>{{ obj }}</td>
+          <td>{{ obj }}</td>
+          <td>{{ obj.role|default:"-" }}</td>
+          <td>{{ obj.email }}</td>
+          <td>
+            {% if obj.is_active %}
+              <span class="badge bg-success">Active</span>
+            {% else %}
+              <span class="badge bg-danger">Inactive</span>
+            {% endif %}
+          </td>
+          <td>{{ obj.date_joined|date:"Y-m-d" }}</td>
+          <td>
+            {% if not obj.is_admin %}
+              <a href="{% url 'update-user' obj.pk %}" class="btn btn-dim btn-outline-primary btn-sm">Update</a>
+              <a href="#" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ obj.pk }}" class="btn btn-dim btn-outline-danger btn-sm">Delete</a>
+              {% if obj.is_active %}
+                <a href="{% url 'deactivate-user' obj.pk %}" class="btn btn-dim btn-outline-info btn-sm">Deactivate</a>
+              {% else %}
+                <a href="{% url 'deactivate-user' obj.pk %}" class="btn btn-dim btn-outline-success btn-sm">Activate</a>
+              {% endif %}
+            {% endif %}
+          </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% for obj in users %}
+<div class="modal fade" id="deleteUserModal{{obj.pk}}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete {{ obj }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-warning">This action is irreversible.</p>
+        <h5>Are you sure you want to delete this user?</h5>
+      </div>
+      <div class="modal-footer bg-light justify-content-between">
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+        <a href="{% url 'delete-user' %}?pk={{obj.pk}}" class="btn btn-outline-danger">Yes</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}

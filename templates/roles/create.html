@@ -1,0 +1,130 @@
+{% extends 'layouts/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %} Create Role {% endblock %}
+
+{% block page_title %}Create Role{% endblock %}
+{% block page_sub_title %}Define a new system role and assign permissions{% endblock %}
+
+{% block actions %}
+  <li class="nk-block-tools-opt">
+    <a href="{% url "role-index" %}" class="btn btn-primary">
+      <em class="icon ni ni-curve-down-left"></em>
+      <span>Back</span>
+    </a>
+  </li>
+{% endblock %}
+
+{% block content %}
+<div class="card card-bordered card-preview">
+  <div class="card-inner">
+    <div class="preview-block">
+      <span class="preview-title-lg overline-title">Role Form</span>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="row">
+          <div class="col-md-6 col-12 mb-3">
+            <label for="{{ form.code.id_for_label }}">Role Code</label>
+            {{ form.code }}
+          </div>
+          <div class="col-md-6 col-12 mb-3">
+            <label for="{{ form.name.id_for_label }}">Role Name</label>
+            {{ form.name }}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12 mb-4">
+            <div class="form-check">
+              {{ form.is_admin }}
+              <label class="form-check-label" for="{{ form.is_admin.id_for_label }}">
+                {{ form.is_admin.label }}
+              </label>
+              <small class="d-block text-muted mt-1">
+                <em class="icon ni ni-info-circle"></em>
+                Users assigned to this role will have full access to the Admin Center.
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <hr>
+        <h5>Permissions</h5>
+
+        <div class="row">
+          {% for content_type, permissions in grouped_permissions %}
+          <div class="col-md-6 col-12 mb-4">
+            <div class="card card-bordered">
+              <div class="card-inner">
+                <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
+                  <input
+                    type="checkbox"
+                    class="form-check-input me-2 group-select-all"
+                    data-group="group_{{ content_type.id }}"
+                    id="select_all_group_{{ content_type.id }}"
+                  />
+                  <label class="form-check-label mb-0 fw-bold" for="select_all_group_{{ content_type.id }}">
+                    {{ content_type.name|capfirst }}
+                  </label>
+                </div>
+
+                {% for permission in permissions %}
+                  <div class="form-check mb-2">
+                    <input
+                      type="checkbox"
+                      class="form-check-input perm-checkbox"
+                      data-group="group_{{ content_type.id }}"
+                      id="perm_{{ permission.id }}"
+                      name="permissions"
+                      value="{{ permission.id }}"
+                      {% if permission in form.permissions.value %}checked{% endif %}
+                    />
+                    <label class="form-check-label" for="perm_{{ permission.id }}">
+                      {{ permission.display_name }}
+                      {% if permission.description %}
+                        <small class="text-muted d-block ms-4">{{ permission.description }}</small>
+                      {% endif %}
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="form-group mt-3">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".group-select-all").forEach(function (groupCheckbox) {
+      groupCheckbox.addEventListener("change", function () {
+        const groupId = this.getAttribute("data-group");
+        const isChecked = this.checked;
+        document.querySelectorAll(`.perm-checkbox[data-group="${groupId}"]`).forEach(function (permCheckbox) {
+          permCheckbox.checked = isChecked;
+        });
+      });
+    });
+
+    document.querySelectorAll(".perm-checkbox").forEach(function (permCheckbox) {
+      permCheckbox.addEventListener("change", function () {
+        const groupId = this.getAttribute("data-group");
+        const groupSelectAll = document.querySelector(`#select_all_${groupId}`);
+        if (groupSelectAll) {
+          const allChecked = document.querySelectorAll(`.perm-checkbox[data-group="${groupId}"]:checked`).length ===
+                             document.querySelectorAll(`.perm-checkbox[data-group="${groupId}"]`).length;
+          groupSelectAll.checked = allChecked;
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

@@ -1,5 +1,4 @@
 from django.db import models
-import uuid
 from django.contrib.contenttypes.models import ContentType
 
 class BaseModel(models.Model):

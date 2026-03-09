@@ -1,0 +1,106 @@
+{% extends 'layouts/base.html' %}
+{% block title %} Update Role {% endblock %}
+
+{% block page_title %}Edit Role{% endblock %}
+{% block page_sub_title %}Update role details and permissions{% endblock %}
+
+{% block actions %}
+  <li class="nk-block-tools-opt">
+    <a href="{% url "role-index" %}" class="btn btn-primary">
+      <em class="icon ni ni-curve-down-left"></em>
+      <span>Back</span>
+    </a>
+  </li>
+{% endblock %}
+
+{% block content %}
+<div class="card card-bordered card-preview">
+  <div class="card-inner">
+    <div class="preview-block">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="row">
+          <div class="col-md-6 col-12 mb-3">
+            <label for="id_code">Role Code</label>
+            {{ form.code }}
+          </div>
+          <div class="col-md-6 col-12 mb-3">
+            <label for="id_name">Role Name</label>
+            {{ form.name }}
+          </div>
+        </div>
+
+        <hr>
+        <h5>Permissions</h5>
+
+        <div class="row">
+          {% for content_type, permissions in grouped_permissions %}
+          <div class="col-md-6 col-12 mb-4">
+            <div class="card card-bordered">
+              <div class="card-inner">
+                <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
+                  <input
+                    type="checkbox"
+                    class="form-check-input me-2 group-select-all"
+                    data-group="{{ content_type.pk }}"
+                    id="select_all_{{ content_type.pk }}"
+                  />
+                  <label class="form-check-label mb-0 fw-bold" for="select_all_{{ content_type.pk }}">
+                    {{ content_type.name|capfirst }}
+                  </label>
+                </div>
+
+                {% for p in permissions %}
+                  <div class="form-check mb-2">
+                    <input
+                      type="checkbox"
+                      class="form-check-input perm-checkbox"
+                      data-group="{{ content_type.pk }}"
+                      id="perm_{{ p.pk }}"
+                      name="permissions"
+                      value="{{ p.pk }}"
+                      {% if p.checked %}checked{% endif %}
+                    />
+                    <label class="form-check-label" for="perm_{{ p.pk }}">
+                      {{ p.display_name }}
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="form-group mt-3">
+          <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".group-select-all").forEach(function (groupCheckbox) {
+      groupCheckbox.addEventListener("change", function () {
+        const groupId = this.dataset.group;
+        const checked = this.checked;
+        document.querySelectorAll(`.perm-checkbox[data-group='${groupId}']`).forEach(function (permCb) {
+          permCb.checked = checked;
+        });
+      });
+    });
+
+    document.querySelectorAll(".perm-checkbox").forEach(function (permCb) {
+      permCb.addEventListener("change", function () {
+        const groupId = this.dataset.group;
+        const all = document.querySelectorAll(`.perm-checkbox[data-group='${groupId}']`);
+        const allChecked = Array.from(all).every(function (cb) { return cb.checked; });
+        document.querySelector(`#select_all_${groupId}`).checked = allChecked;
+      });
+    });
+  });
+</script>
+{% endblock %}

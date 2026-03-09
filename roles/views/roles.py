@@ -44,14 +44,14 @@ class RoleUpdateView(LoginRequiredMixin, SafeUpdateView):
         grouped_permissions = defaultdict(list)
 
         # Permissions already assigned to this role
-        assigned_permissions = set(self.object.permissions.values_list('uid', flat=True))
+        assigned_permissions = set(self.object.permissions.values_list('pk', flat=True))
 
         # Grouping all available permissions for display
         for perm in CustomPermission.objects.filter(is_active=True).select_related('content_type'):
             grouped_permissions[perm.content_type].append({
-                "uid": perm.uid,
+                "pk": perm.pk,
                 "display_name": perm.display_name,
-                "checked": perm.uid in assigned_permissions
+                "checked": perm.pk in assigned_permissions
             })
 
         context["grouped_permissions"] = grouped_permissions.items()
@@ -60,8 +60,8 @@ class RoleUpdateView(LoginRequiredMixin, SafeUpdateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         # Update permissions from request
-        permission_uids = self.request.POST.getlist("permissions")
-        self.object.permissions.set(permission_uids)
+        permission_pks = self.request.POST.getlist("permissions")
+        self.object.permissions.set(permission_pks)
         return response
     
 class RoleDetailView(LoginRequiredMixin, DetailView):

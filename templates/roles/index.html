@@ -1,0 +1,105 @@
+{% extends 'layouts/base.html' %}
+{% block title %} System Roles {% endblock %}
+
+{% block page_title %}Role Management{% endblock %}
+{% block page_sub_title %}Manage system roles and permissions{% endblock %}
+
+{% block actions %}
+  <li class="nk-block-tools-opt">
+    <a href="{% url "role-create" %}" class="btn btn-primary">
+      <em class="icon ni ni-plus-round"></em>
+      <span>Create System Role</span>
+    </a>
+  </li>
+{% endblock %}
+
+{% block content %}
+
+
+<div class="card card-bordered card-preview">
+  <div class="card-inner">
+    <table class="datatable-init-export nowrap table" data-export-title="Export Roles">
+      <thead>
+        <tr>
+          <th data-priority="1">Name</th>
+          <th data-priority="3">Code</th>
+          <th data-priority="5">Total Permissions</th>
+          <th data-priority="6">Is Admin</th>
+          <th data-priority="7">Is Active</th>
+          <th data-priority="8">Created On</th>
+          <th data-priority="9">Last Updated On</th>
+          <th data-priority="2">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for obj in roles %}
+        <tr>
+          <td>
+            {% if not obj.is_admin %}
+            <a href="{% url "role-update" obj.pk %}"><span>{{obj.name}}</span></a>
+            {% else %}
+            <span>{{obj.name}}</span>
+            {% endif %}
+          </td>
+          <td>{{ obj.code }}</td>
+          <td>
+            {% if not obj.is_admin %}
+            {{ obj.permissions.count }}
+            {% else %}
+            <span class="badge bg-success">All</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if obj.is_admin %}
+              <span class="badge bg-success">Yes</span>
+            {% else %}
+              <span class="badge bg-info">No</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if obj.is_active %}
+              <span class="badge bg-success">Yes</span>
+            {% else %}
+              <span class="badge bg-danger">No</span>
+            {% endif %}
+          </td>
+          <td>{{ obj.created|date:"Y-m-d H:i:s" }}</td>
+          <td>{{ obj.updated|date:"Y-m-d H:i:s" }}</td>
+          <td>
+              <a href="{% url 'role-update' obj.pk %}" class="btn btn-dim btn-outline-primary btn-sm">Update</a>
+              <a href="#" data-bs-toggle="modal" data-bs-target="#deleteRoleModal{{ obj.pk }}" class="btn btn-dim btn-outline-danger btn-sm">Delete</a>
+              {% if obj.is_active %}
+                <a href="{% url 'role-toggle-active' obj.pk %}" class="btn btn-dim btn-outline-info btn-sm">Deactivate</a>
+              {% else %}
+                <a href="{% url 'role-toggle-active' obj.pk %}" class="btn btn-dim btn-outline-success btn-sm">Activate</a>
+              {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% for obj in roles %}
+<div class="modal fade" id="deleteRoleModal{{obj.pk}}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete {{ obj }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-warning">This action is irreversible.</p>
+        <h5>Are you sure you want to delete this role?</h5>
+      </div>
+      <div class="modal-footer bg-light justify-content-between">
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+        <a href="{% url 'role-delete' obj.pk %}" class="btn btn-outline-danger">Yes</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}

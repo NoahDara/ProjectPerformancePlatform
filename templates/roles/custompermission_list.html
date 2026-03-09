@@ -1,0 +1,51 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Permissions{% endblock title %}
+
+{% block page_title %}Permissions{% endblock %}
+
+{% block page_sub_title %}Manage and organize all permission locations{% endblock %}
+
+{% block actions %}
+
+{% endblock %}
+
+{% block content %}
+<div class="card card-bordered card-preview">
+  <div class="card-inner">
+    <table class="datatable-init-export nowrap table" data-export-title="Export Permissions">
+      <thead>
+        <tr>
+          <th>Content Type</th>
+          <th>Code</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Is Active</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for obj in permissions %}
+
+        {% if obj.is_active %}
+        <tr>
+            <td>{{obj.content_type}}</td>
+            <td>{{obj.code}}</td>
+            <td>{{obj.name}}</td>
+            <td>{{obj.description}}</td>
+            <td>
+              {% if obj.is_active %}
+                <span class="badge bg-success">Active</span>
+              {% else %}
+                <span class="badge bg-danger">Inactive</span>
+              {% endif %}
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
+{% endblock %}
