@@ -30,7 +30,15 @@ INSTALLED_APPS = [
     'allauth.socialaccount', 
     
     'accounts.apps.AccountsConfig',
+    'benchmarking.apps.BenchmarkingConfig',
+    'branches.apps.BranchesConfig',
+    'clients.apps.ClientsConfig',
     'dashboard.apps.DashboardConfig',
+    'disciplines.apps.DisciplinesConfig',
+    'employees.apps.EmployeesConfig',
+    'projects.apps.ProjectsConfig',
+    'roles.apps.RolesConfig',
+    'tasks.apps.TasksConfig',
     
     #3rd party apps
     "debug_toolbar",

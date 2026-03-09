@@ -1,7 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from helpers.models import BaseModel
-from clients.models import Client
 from employees.models import Employee
 
 
@@ -26,7 +25,7 @@ class Project(BaseModel):
         related_name="projects"
     )
     client = models.ForeignKey(
-        Client,
+        "clients.Client",
         on_delete=models.SET_NULL,
         null=True,
         related_name="projects"

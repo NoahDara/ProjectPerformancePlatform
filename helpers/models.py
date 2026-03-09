@@ -8,7 +8,6 @@ class BaseModel(models.Model):
     Provides common fields: is_active, is_deleted, created, updated
     Automatically orders by most recently updated first
     """
-    uid = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, editable=False)
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     
