@@ -1,67 +1,19 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
-from django.views.generic import DetailView, ListView, UpdateView, DeleteView, TemplateView, FormView, UpdateView
+from django.views.generic import DetailView, ListView, UpdateView, TemplateView, UpdateView, CreateView
 from django.views import View
-from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http.response import HttpResponse as HttpResponse
 from django.contrib.auth import get_user_model
+
+from helpers.helpers import send_onboarding_reset_password_mail
 User = get_user_model()
-from django.utils.http import url_has_allowed_host_and_scheme
-from django.contrib.auth.views import PasswordResetView
-from django.contrib.auth.hashers import make_password
-from ..forms import CustomUserCreationForm, CustomUserUpdateForm, LoginForm
-from django.contrib.auth import logout
+from ..forms import CustomUserCreationForm, CustomUserUpdateForm, LoginForm, ProfileUpdateForm
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-
-
-def logout_view(request):
-    logout(request)
-    return redirect('login')
-
-class LoginUserView(FormView):
-    template_name = "accounts/login.html"
-    form_class = LoginForm
-    success_url = reverse_lazy("dashboard")  
-
-    def form_valid(self, form):
-        username = form.cleaned_data.get("username")
-        password = form.cleaned_data.get("password")
-        user = authenticate(self.request, username=username, password=password)
-
-        if user is not None:
-            login(self.request, user)
-
-            employee = getattr(user, "employee", None)
-            
-            if user.is_active:
-                if employee:
-                    messages.success(self.request, f"You have successfully logged in as {employee}")
-                else:
-                    messages.success(self.request, f"You have successfully logged in as {user}")
-            else:
-                messages.warning(self.request, "Your account is inactive. Please contact system administrator.")
-
-            # Handle the 'next' parameter for redirection
-            next_url = self.request.GET.get('next')
-            if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={self.request.get_host()}):
-                return redirect(next_url)
-            
-            # Default to success_url if 'next' is not set or not safe
-            return super().form_valid(form)
-        else:
-            messages.warning(
-                self.request, "Please check your credentials and try again"
-            )
-            return redirect("login")
-
-    def dispatch(self, request, *args, **kwargs):
-        if self.request.user.is_authenticated:
-            return redirect(self.success_url)
-        return super().dispatch(request, *args, **kwargs)
+from employees.models import Employee
 
 
 class UserListView(LoginRequiredMixin, ListView):
@@ -70,51 +22,78 @@ class UserListView(LoginRequiredMixin, ListView):
     context_object_name = "users"
 
 
-def register_user(request):
-    if request.method == "GET":
-        return render(
-            request, "accounts/create.html", {"form": CustomUserCreationForm}
-        )
-    elif request.method == "POST":
-        form = CustomUserCreationForm(request.POST)
-    if form.is_valid():
-        form.save()
-        messages.success(request, ("User created successfully"))
-        return redirect("users-index")
-    else:
-        messages.success(request, ("Something went wrong please try again"))
-        return redirect("register-user")
-
-
-class UserUpdateView(SuccessMessageMixin, UpdateView):
+class UserCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    """
+    Creates a user account from an existing Employee.
+    Inherits first_name, last_name, email, and username from the employee.
+    Only requires the user to select a role.
+    """
     model = User
-    form_class = CustomUserUpdateForm
-    success_message = "User updated successfully"
-    context_object_name = "user"
+    form_class = CustomUserCreationForm
+    template_name = "accounts/create.html"
+    success_message = "User account created successfully"
 
-    def get_template_names(self):
-        user = self.get_object()
-        if self.request.user.is_superuser:
-            return ["accounts/update.html"]
-        return ["accounts/self_update.html"]
-        
+    def get_employee(self):
+        return get_object_or_404(Employee, pk=self.kwargs["employee_pk"])
 
-    def get_success_url(self):
-        user = self.get_object()
-        if self.request.user.is_superuser:
-            return reverse("users-index")
-        return reverse("dashboard")
-        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["employee"] = self.get_employee()
+        return context
 
     def form_valid(self, form):
-        password = form.cleaned_data.get("password")
-        if password:
-            form.instance.password = make_password(password)
+        employee = self.get_employee()
+
+        user = form.save(commit=False)
+        user.first_name = employee.first_name
+        user.last_name = employee.last_name
+        user.email = employee.email
+        user.username = employee.email  
+        user.save()
+
+        # Link the user back to the employee
+        employee.user = user
+        employee.save()
+        
+        send_onboarding_reset_password_mail(self.request, user)
 
         return super().form_valid(form)
 
-    # def get_required_permissions(self):
-    #     return ['Can change user']
+    def get_success_url(self):
+        return reverse("employee-detail", kwargs={"pk": self.get_employee().pk})
+
+
+class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    """
+    Allows admins to update a user's role.
+    """
+    model = User
+    form_class = CustomUserUpdateForm
+    template_name = "accounts/update.html"
+    success_message = "User updated successfully"
+    context_object_name = "user_obj"  
+
+    def get_success_url(self):
+        return reverse("users-index")
+
+
+class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    """
+    Allows a user to update their own profile details.
+    """
+    model = User
+    form_class = ProfileUpdateForm
+    template_name = "accounts/profile_update.html"
+    success_message = "Profile updated successfully"
+
+    def get_object(self, queryset=None):
+        # Always update the currently logged-in user
+        return self.request.user
+
+    def get_success_url(self):
+        return reverse("profile-update")
+
+        
 
 class UserDeleteView(LoginRequiredMixin, TemplateView):
     def get(self, request, **kwargs):

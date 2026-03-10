@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome — Set Your Password</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: #0f0f0f;
+      font-family: 'DM Sans', sans-serif;
+      color: #1a1a1a;
+      padding: 40px 16px;
+    }
+
+    .wrapper {
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    /* ── Header bar ── */
+    .header {
+      background: #1a1a1a;
+      border-radius: 16px 16px 0 0;
+      padding: 32px 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #f5c842, #e8a020);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Serif Display', serif;
+      font-size: 18px;
+      color: #1a1a1a;
+      font-weight: bold;
+    }
+
+    .logo-name {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 15px;
+      color: #f0f0f0;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Hero section ── */
+    .hero {
+      background: linear-gradient(160deg, #fffdf4 0%, #fff8e1 100%);
+      padding: 52px 40px 40px;
+      border-left: 1px solid #f0e8c8;
+      border-right: 1px solid #f0e8c8;
+      text-align: center;
+    }
+
+    .hero-icon {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #f5c842, #e8a020);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      font-size: 28px;
+    }
+
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 34px;
+      color: #1a1a1a;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: #c48a00;
+    }
+
+    .hero p {
+      font-size: 15px;
+      color: #5a5a5a;
+      line-height: 1.7;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    /* ── Body card ── */
+    .body-card {
+      background: #ffffff;
+      padding: 40px;
+      border-left: 1px solid #e8e8e8;
+      border-right: 1px solid #e8e8e8;
+    }
+
+    .greeting {
+      font-size: 15px;
+      color: #3a3a3a;
+      line-height: 1.8;
+      margin-bottom: 28px;
+    }
+
+    .greeting strong {
+      color: #1a1a1a;
+      font-weight: 500;
+    }
+
+    /* ── Info row ── */
+    .info-row {
+      background: #f9f7f2;
+      border: 1px solid #ede8d8;
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #4a4a4a;
+    }
+
+    .info-item .dot {
+      width: 6px;
+      height: 6px;
+      background: #e8a020;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .info-item span { color: #1a1a1a; font-weight: 500; }
+
+    /* ── CTA button ── */
+    .cta-wrap {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #f5c842, #e8a020);
+      color: #1a1a1a !important;
+      text-decoration: none;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 15px;
+      padding: 15px 40px;
+      border-radius: 50px;
+      letter-spacing: 0.3px;
+      box-shadow: 0 4px 20px rgba(232, 160, 32, 0.35);
+    }
+
+    .cta-note {
+      font-size: 12px;
+      color: #999;
+      margin-top: 12px;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      border: none;
+      border-top: 1px solid #eeeeee;
+      margin: 28px 0;
+    }
+
+    /* ── Fallback link box ── */
+    .link-box {
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 14px 18px;
+    }
+
+    .link-box p {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 6px;
+    }
+
+    .link-box a {
+      font-size: 11.5px;
+      color: #b07800;
+      word-break: break-all;
+      text-decoration: none;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      background: #1a1a1a;
+      border-radius: 0 0 16px 16px;
+      padding: 28px 40px;
+      text-align: center;
+    }
+
+    .footer p {
+      font-size: 12px;
+      color: #777;
+      line-height: 1.8;
+    }
+
+    .footer a {
+      color: #c8a040;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="logo-mark">D</div>
+      <span class="logo-name">Daarah Enterprise Suite</span>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-icon">👋</div>
+      <h1>Welcome aboard,<br><em>{{ user.first_name }}.</em></h1>
+      <p>Your account has been created. One last step — set your password to get started.</p>
+    </div>
+
+    <!-- Body -->
+    <div class="body-card">
+
+      <p class="greeting">
+        Hi <strong>{{ user.get_full_name }}</strong>,<br><br>
+        An account has been set up for you. Your login details are ready —
+        just click the button below to create your password and access your dashboard.
+      </p>
+
+      <!-- Account details -->
+      <div class="info-row">
+        <div class="info-item">
+          <div class="dot"></div>
+          Login email: <span>{{ user.email }}</span>
+        </div>
+        <div class="info-item">
+          <div class="dot"></div>
+          Role: <span>{{ user.role }}</span>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-wrap">
+        <a href="{{ reset_url }}" class="cta-btn">Set My Password →</a>
+        <p class="cta-note">This link expires in 24 hours.</p>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Fallback -->
+      <div class="link-box">
+        <p>If the button doesn't work, copy and paste this link into your browser:</p>
+        <a href="{{ reset_url }}">{{ reset_url }}</a>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>
+        If you didn't expect this email, you can safely ignore it.<br>
+        &copy; {% now "Y" %} Daarah Tech. All rights reserved.
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>

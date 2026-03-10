@@ -1,0 +1,93 @@
+{% extends 'layouts/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Update Profile{% endblock title %}
+
+{% block page_title %}Update Profile{% endblock %}
+{% block page_sub_title %}{{ request.user }}{% endblock %}
+
+{% block actions %}
+  <li class="nk-block-tools-opt">
+    <a href="{% url "dashboard" %}" class="btn btn-primary">
+      <em class="icon ni ni-curve-down-left"></em>
+      <span>Back</span>
+    </a>
+  </li>
+{% endblock %}
+
+{% block content %}
+<div class="row g-gs">
+
+  <!-- Profile Summary Card -->
+  <div class="col-lg-4">
+    <div class="card card-bordered h-100">
+      <div class="card-inner">
+        <div class="user-card user-card-s2 flex-column text-center py-4">
+
+          <div class="user-avatar lg bg-primary">
+            <span>
+              {{ request.user.first_name|slice:":1" }}{{ request.user.last_name|slice:":1" }}
+            </span>
+          </div>
+
+          <div class="user-info mt-3">
+            <h5>{{ request.user.get_full_name|default:request.user.username }}</h5>
+            <span class="sub-text">{{ request.user.email }}</span>
+            {% if request.user.role %}
+              <span class="badge bg-outline-primary mt-1">{{ request.user.role }}</span>
+            {% endif %}
+          </div>
+
+          <div class="divider my-4 w-100"></div>
+
+          <ul class="list-group list-group-flush w-100 text-start">
+            <li class="list-group-item px-0 d-flex justify-content-between">
+              <span class="text-soft">Username</span>
+              <span class="fw-medium">{{ request.user.username }}</span>
+            </li>
+            <li class="list-group-item px-0 d-flex justify-content-between">
+              <span class="text-soft">First Name</span>
+              <span class="fw-medium">{{ request.user.first_name|default:"—" }}</span>
+            </li>
+            <li class="list-group-item px-0 d-flex justify-content-between">
+              <span class="text-soft">Last Name</span>
+              <span class="fw-medium">{{ request.user.last_name|default:"—" }}</span>
+            </li>
+            <li class="list-group-item px-0 d-flex justify-content-between">
+              <span class="text-soft">Email</span>
+              <span class="fw-medium">{{ request.user.email|default:"—" }}</span>
+            </li>
+          </ul>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Form Card -->
+  <div class="col-lg-8">
+    <div class="card card-bordered">
+      <div class="card-inner">
+        <div class="preview-block">
+          <span class="preview-title-lg overline-title">Profile Details</span>
+          <p class="text-soft mb-4">Update your personal information below.</p>
+
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.get_error_html|safe }}
+
+            <div class="row gy-4">
+              {{ form.render_form|safe }}
+            </div>
+
+            <div class="form-group mt-3">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

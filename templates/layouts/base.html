@@ -126,5 +126,38 @@
     </div>
 
     {% include "./scripts.html" %}
+
+<!-- Logout Confirmation Modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+
+      <div class="modal-body modal-body-md text-center">
+        <div class="nk-modal">
+
+          <!-- Icon -->
+          <em class="icon ni ni-signout nk-modal-icon icon-circle icon-circle-xxl bg-warning"></em>
+
+          <h4 class="nk-modal-title mt-3">Sign Out?</h4>
+          <p class="text-soft">Are you sure you want to sign out of your account?</p>
+
+          <div class="d-flex flex-wrap justify-content-center gap-2">
+            <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">
+              Cancel
+            </button>
+            <a href="{% url 'logout' %}" class="btn btn-warning">
+              <em class="icon ni ni-signout"></em>
+              <span>Yes, Sign out</span>
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
   </body>
 </html>

@@ -35,9 +35,9 @@
                     <em class="icon ni ni-user-alt"></em>
                   </div>
                   <div class="user-info d-none d-md-block">
-                    <div class="user-status">Administrator</div>
+                    <div class="user-status">{{ request.user.role }}</div>
                     <div class="user-name dropdown-indicator">
-                      Abu Bin Ishityak
+                      {{ request.user }}
                     </div>
                   </div>
                 </div>
@@ -45,13 +45,17 @@
               <div class="dropdown-menu dropdown-menu-md dropdown-menu-end dropdown-menu-s1">
                 <div class="dropdown-inner user-card-wrap bg-lighter d-none d-md-block">
                   <div class="user-card">
-                    <div class="user-avatar"><span>AB</span></div>
+
+                    {% if request.first_name %}
+                    <div class="user-avatar"><span>{{ request.user.first_name|slice:":1" }}{{ request.user.last_name|slice:":1" }}</span></div>
+                    {% else %}
+                    <div class="user-avatar"><span>{{ request.user.username|slice:":2" }}</span></div>
+                    {% endif %}
+
                     <div class="user-info">
-                      <span class="lead-text">Abu Bin Ishtiyak</span>
+                      <span class="lead-text">{{ request.user.get_full_name }}</span>
                       <span class="sub-text">
-                        <a href="https://dashlite.net/cdn-cgi/l/email-protection" class="__cf_email__" 
-                             data-cfemail="4b22252d240b38242d3f25222465282426">[email&#160;protected]
-                        </a>
+                        <a href="mailto:{{ request.user.email }}">{{ request.user.email }}</a>
                       </span>
                     </div>
                   </div>
@@ -59,9 +63,15 @@
                 <div class="dropdown-inner">
                   <ul class="link-list">
                     <li>
-                      <a href="user-profile-regular.html" >
-                        <em class="icon ni ni-user-alt"></em>
-                        <span>View Profile</span>
+                      <a href="{% url "profile-update" %}" >
+                        <em class="icon ni ni-user-fill"></em>
+                        <span>Update Profile</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="{% url "password_change" %}" >
+                        <em class="icon ni ni-lock-alt"></em>
+                        <span>Change Password</span>
                       </a>
                     </li>
                   </ul>
@@ -69,7 +79,7 @@
                 <div class="dropdown-inner">
                   <ul class="link-list">
                     <li> 
-                      <a href="#">
+                      <a href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
                         <em class="icon ni ni-signout"></em>
                         <span>Sign out</span>
                       </a>
@@ -78,7 +88,7 @@
                 </div>
               </div>
             </li>
-            <li class="dropdown notification-dropdown me-n1">
+            {% comment %} <li class="dropdown notification-dropdown me-n1">
               <a href="#" class="dropdown-toggle nk-quick-nav-icon" data-bs-toggle="dropdown">
                 <div class="icon-status icon-status-info">
                   <em class="icon ni ni-bell"></em>
@@ -110,9 +120,11 @@
                   <a href="#">View All</a>
                 </div>
               </div>
-            </li>
+            </li> {% endcomment %}
           </ul>
         </div>
       </div>
     </div>
   </div>
+
+

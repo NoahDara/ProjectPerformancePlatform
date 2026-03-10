@@ -3,11 +3,16 @@ from .custom_views import (
 )
 
 from .registration import (
-    LoginUserView,
-    logout_view,
     UserListView,
-    register_user,
     UserUpdateView,
     UserDeleteView,
     UserDeactivateView,
+    UserCreateView,
+    UserUpdateView,
+    ProfileUpdateView,
+)
+
+from .login import (
+    LoginUserView,
+    logout_view,
 )
