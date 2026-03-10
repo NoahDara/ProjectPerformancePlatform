@@ -162,7 +162,14 @@ LOGIN_REDIRECT_URL = 'dashboard'
 ACCOUNT_LOGOUT_REDIRECT = "login"
 
 # Emails
-EMAIL_BACKEND = 'config.helpers.DynamicEmailBackend'
+EMAIL_BACKEND = config("EMAIL_BACKEND")
+EMAIL_USE_TLS = config('EMAIL_USE_TLS')
+Email_USE_SSL=False
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
 ADMINS = [
     ("noah", "noahdara2004@gmail.com"),]

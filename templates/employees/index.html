@@ -34,7 +34,7 @@
       <tbody>
         {% for obj in employees %}
         <tr>
-          <td><a href="{% url 'employee-detail' obj.pk %}">{{ obj.full_name }}</a></td>
+          <td><a href="">{{ obj.full_name }}</a></td>
           <td>{{ obj.email }}</td>
           <td>{{ obj.phone|default:"-" }}</td>
           <td>{{ obj.branch|default:"-" }}</td>
@@ -53,6 +53,10 @@
               {% if obj.is_active %}Deactivate{% else %}Activate{% endif %}
             </a>
             <a href="#" data-bs-toggle="modal" data-bs-target="#employeeDeleteModal{{ obj.pk }}" class="btn btn-dim btn-outline-danger btn-sm">Delete</a>
+
+            {% if not obj.user %}
+            <a href="{% url 'user-create' obj.pk %}" class="btn btn-dim btn-outline-primary btn-sm">Authenticate</a>
+            {% endif %}
           </td>
         </tr>
         {% endfor %}

@@ -8,7 +8,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.http.response import HttpResponse as HttpResponse
 from django.contrib.auth import get_user_model
 
-from helpers.helpers import send_onboarding_reset_password_mail
+from helpers.emails import send_onboarding_reset_password_mail
 User = get_user_model()
 from ..forms import CustomUserCreationForm, CustomUserUpdateForm, LoginForm, ProfileUpdateForm
 from django.conf import settings
@@ -55,12 +55,21 @@ class UserCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         employee.user = user
         employee.save()
         
-        send_onboarding_reset_password_mail(self.request, user)
+        try:
+            send_onboarding_reset_password_mail(self.request, user)
+        except Exception:
+            user.set_password("IQ#2026")
+            user.save()
+            messages.error(
+                self.request,
+                "An error occurred sending the welcome email. "
+                "A temporary password has been set: IQ#2026"
+            )
 
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse("employee-detail", kwargs={"pk": self.get_employee().pk})
+        return reverse("employee-index")
 
 
 class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
