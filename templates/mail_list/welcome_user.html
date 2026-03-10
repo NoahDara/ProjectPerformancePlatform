@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Welcome — Set Your Password</title>
+  <title>Welcome to EngineIQ</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap');
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background-color: #0f0f0f;
+      background-color: #07090f;
       font-family: 'DM Sans', sans-serif;
-      color: #1a1a1a;
+      color: #e0e6f0;
       padding: 40px 16px;
     }
 
@@ -21,131 +21,166 @@
       margin: 0 auto;
     }
 
-    /* ── Header bar ── */
+    /* ── Header ── */
     .header {
-      background: #1a1a1a;
-      border-radius: 16px 16px 0 0;
-      padding: 32px 40px;
+      background: #080c12;
+      border: 1px solid #1a2235;
+      border-bottom: none;
+      border-radius: 14px 14px 0 0;
+      padding: 28px 36px;
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .logo-mark {
-      width: 36px;
-      height: 36px;
-      background: linear-gradient(135deg, #f5c842, #e8a020);
+    .logo-icon {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, #c8f060, #8edd20);
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'DM Serif Display', serif;
-      font-size: 18px;
-      color: #1a1a1a;
-      font-weight: bold;
+    }
+
+    .logo-icon svg {
+      width: 20px;
+      height: 20px;
     }
 
     .logo-name {
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 500;
-      font-size: 15px;
-      color: #f0f0f0;
-      letter-spacing: 0.5px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: #f0f4ff;
+      letter-spacing: 0.3px;
     }
 
-    /* ── Hero section ── */
+    .logo-name span { color: #c8f060; }
+
+    /* ── Hero ── */
     .hero {
-      background: linear-gradient(160deg, #fffdf4 0%, #fff8e1 100%);
-      padding: 52px 40px 40px;
-      border-left: 1px solid #f0e8c8;
-      border-right: 1px solid #f0e8c8;
-      text-align: center;
+      background: linear-gradient(160deg, #0b1020 0%, #0d1628 100%);
+      border: 1px solid #1a2235;
+      border-bottom: none;
+      border-top: none;
+      padding: 48px 36px 36px;
+      position: relative;
+      overflow: hidden;
     }
 
-    .hero-icon {
-      width: 64px;
-      height: 64px;
-      background: linear-gradient(135deg, #f5c842, #e8a020);
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 24px;
-      font-size: 28px;
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(200, 240, 96, 0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #c8f060;
+      background: rgba(200, 240, 96, 0.08);
+      border: 1px solid rgba(200, 240, 96, 0.2);
+      border-radius: 4px;
+      padding: 4px 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
     }
 
     .hero h1 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 34px;
-      color: #1a1a1a;
+      font-family: 'Syne', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: #f0f4ff;
       line-height: 1.2;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .hero h1 em {
-      font-style: italic;
-      color: #c48a00;
+      font-style: normal;
+      color: #c8f060;
     }
 
     .hero p {
-      font-size: 15px;
-      color: #5a5a5a;
+      font-size: 14px;
+      color: #8a9ab8;
       line-height: 1.7;
-      max-width: 420px;
-      margin: 0 auto;
+      max-width: 400px;
     }
 
-    /* ── Body card ── */
+    /* ── Body ── */
     .body-card {
-      background: #ffffff;
-      padding: 40px;
-      border-left: 1px solid #e8e8e8;
-      border-right: 1px solid #e8e8e8;
+      background: #0e1421;
+      border: 1px solid #1a2235;
+      border-top: none;
+      border-bottom: none;
+      padding: 36px;
     }
 
     .greeting {
-      font-size: 15px;
-      color: #3a3a3a;
-      line-height: 1.8;
+      font-size: 14px;
+      color: #a0aec0;
+      line-height: 1.85;
       margin-bottom: 28px;
     }
 
     .greeting strong {
-      color: #1a1a1a;
+      color: #e0e6f0;
       font-weight: 500;
     }
 
-    /* ── Info row ── */
-    .info-row {
-      background: #f9f7f2;
-      border: 1px solid #ede8d8;
+    /* ── Info box ── */
+    .info-box {
+      background: #080c12;
+      border: 1px solid #1e2d45;
       border-radius: 10px;
-      padding: 18px 22px;
+      padding: 20px 24px;
       margin-bottom: 32px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    }
+
+    .info-box-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #4a6080;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
     }
 
     .info-item {
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 14px;
-      color: #4a4a4a;
+      font-size: 13px;
+      color: #7a90b0;
+      padding: 7px 0;
+      border-bottom: 1px solid #131d2e;
     }
 
-    .info-item .dot {
-      width: 6px;
-      height: 6px;
-      background: #e8a020;
-      border-radius: 50%;
+    .info-item:last-child { border-bottom: none; }
+
+    .info-key {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #4a6080;
+      width: 80px;
       flex-shrink: 0;
     }
 
-    .info-item span { color: #1a1a1a; font-weight: 500; }
+    .info-val {
+      color: #c8f060;
+      font-weight: 500;
+      font-size: 13px;
+    }
 
-    /* ── CTA button ── */
+    /* ── CTA ── */
     .cta-wrap {
       text-align: center;
       margin-bottom: 28px;
@@ -153,67 +188,72 @@
 
     .cta-btn {
       display: inline-block;
-      background: linear-gradient(135deg, #f5c842, #e8a020);
-      color: #1a1a1a !important;
+      background: linear-gradient(135deg, #c8f060, #8edd20);
+      color: #080c12 !important;
       text-decoration: none;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 500;
-      font-size: 15px;
-      padding: 15px 40px;
-      border-radius: 50px;
-      letter-spacing: 0.3px;
-      box-shadow: 0 4px 20px rgba(232, 160, 32, 0.35);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 14px 42px;
+      border-radius: 6px;
+      letter-spacing: 0.4px;
     }
 
     .cta-note {
-      font-size: 12px;
-      color: #999;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #3a5070;
       margin-top: 12px;
+      letter-spacing: 0.5px;
     }
 
     /* ── Divider ── */
     .divider {
       border: none;
-      border-top: 1px solid #eeeeee;
+      border-top: 1px solid #131d2e;
       margin: 28px 0;
     }
 
-    /* ── Fallback link box ── */
+    /* ── Fallback ── */
     .link-box {
-      background: #f5f5f5;
+      background: #080c12;
+      border: 1px solid #1a2235;
       border-radius: 8px;
       padding: 14px 18px;
     }
 
     .link-box p {
       font-size: 12px;
-      color: #888;
+      color: #4a6080;
       margin-bottom: 6px;
     }
 
     .link-box a {
-      font-size: 11.5px;
-      color: #b07800;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #8ac840;
       word-break: break-all;
       text-decoration: none;
     }
 
     /* ── Footer ── */
     .footer {
-      background: #1a1a1a;
-      border-radius: 0 0 16px 16px;
-      padding: 28px 40px;
+      background: #080c12;
+      border: 1px solid #1a2235;
+      border-top: 1px solid #131d2e;
+      border-radius: 0 0 14px 14px;
+      padding: 24px 36px;
       text-align: center;
     }
 
     .footer p {
-      font-size: 12px;
-      color: #777;
-      line-height: 1.8;
+      font-size: 11.5px;
+      color: #3a5070;
+      line-height: 1.9;
     }
 
     .footer a {
-      color: #c8a040;
+      color: #5a8090;
       text-decoration: none;
     }
   </style>
@@ -223,15 +263,21 @@
 
     <!-- Header -->
     <div class="header">
-      <div class="logo-mark">D</div>
-      <span class="logo-name">Daarah Enterprise Suite</span>
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080c12"/>
+          <path d="M2 17l10 5 10-5" stroke="#080c12" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M2 12l10 5 10-5" stroke="#080c12" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="logo-name">Engine<span>IQ</span></span>
     </div>
 
     <!-- Hero -->
     <div class="hero">
-      <div class="hero-icon">👋</div>
+      <div class="hero-tag">// account created</div>
       <h1>Welcome aboard,<br><em>{{ user.first_name }}.</em></h1>
-      <p>Your account has been created. One last step — set your password to get started.</p>
+      <p>Your workspace is ready. Set your password to start tracking projects across every discipline.</p>
     </div>
 
     <!-- Body -->
@@ -239,33 +285,35 @@
 
       <p class="greeting">
         Hi <strong>{{ user.get_full_name }}</strong>,<br><br>
-        An account has been set up for you. Your login details are ready —
-        just click the button below to create your password and access your dashboard.
+        You've been added to the EngineIQ platform. Click the button below to
+        set your password and access your project dashboard — where your team's
+        work is tracked in real-time, from field to boardroom.
       </p>
 
       <!-- Account details -->
-      <div class="info-row">
+      <div class="info-box">
+        <div class="info-box-label">// account details</div>
         <div class="info-item">
-          <div class="dot"></div>
-          Login email: <span>{{ user.email }}</span>
+          <span class="info-key">email</span>
+          <span class="info-val">{{ user.email }}</span>
         </div>
         <div class="info-item">
-          <div class="dot"></div>
-          Role: <span>{{ user.role }}</span>
+          <span class="info-key">role</span>
+          <span class="info-val">{{ user.role }}</span>
         </div>
       </div>
 
       <!-- CTA -->
       <div class="cta-wrap">
         <a href="{{ reset_url }}" class="cta-btn">Set My Password →</a>
-        <p class="cta-note">This link expires in 24 hours.</p>
+        <p class="cta-note">// link expires in 24 hours</p>
       </div>
 
       <hr class="divider">
 
       <!-- Fallback -->
       <div class="link-box">
-        <p>If the button doesn't work, copy and paste this link into your browser:</p>
+        <p>Button not working? Paste this link directly into your browser:</p>
         <a href="{{ reset_url }}">{{ reset_url }}</a>
       </div>
 
@@ -275,7 +323,7 @@
     <div class="footer">
       <p>
         If you didn't expect this email, you can safely ignore it.<br>
-        &copy; {% now "Y" %} Daarah Tech. All rights reserved.
+        &copy; {% now "Y" %} EngineIQ Analytics. All rights reserved.
       </p>
     </div>
 
