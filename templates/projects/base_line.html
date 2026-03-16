@@ -1,0 +1,122 @@
+
+
+<div class="tab-pane fade" id="pane-baseline" role="tabpanel">
+    <div class="row g-gs mt-1">
+
+    <div class="col-lg-6">
+        <div class="card card-bordered h-100">
+        <div class="card-inner">
+            <h6 class="card-title mb-3">Schedule</h6>
+            {% if project.baseline_locked %}
+            <ul class="data-list is-compact">
+            <li class="data-item">
+                <div class="data-col"><span class="data-label text-muted">Baseline Start</span></div>
+                <div class="data-col"><span class="data-value">{{ project.baseline_start_date|date:"d M Y" }}</span></div>
+            </li>
+            <li class="data-item">
+                <div class="data-col"><span class="data-label text-muted">Actual Start</span></div>
+                <div class="data-col"><span class="data-value">{{ project.start_date|date:"d M Y" }}</span></div>
+            </li>
+            <li class="data-item">
+                <div class="data-col"><span class="data-label text-muted">Baseline End</span></div>
+                <div class="data-col"><span class="data-value">{{ project.baseline_end_date|date:"d M Y" }}</span></div>
+            </li>
+            <li class="data-item">
+                <div class="data-col"><span class="data-label text-muted">Current Planned End</span></div>
+                <div class="data-col">
+                <span class="data-value {% if schedule_variance > 0 %}text-danger{% elif schedule_variance < 0 %}text-success{% endif %}">
+                    {{ project.planned_end_date|date:"d M Y" }}
+                </span>
+                </div>
+            </li>
+            <li class="data-item">
+                <div class="data-col"><span class="data-label text-muted">Variance</span></div>
+                <div class="data-col">
+                {% if schedule_variance > 0 %}
+                    <span class="data-value text-danger fw-bold">+{{ schedule_variance }} days (delayed)</span>
+                {% elif schedule_variance < 0 %}
+                    <span class="data-value text-success fw-bold">{{ schedule_variance }} days (ahead)</span>
+                {% else %}
+                    <span class="data-value text-success fw-bold">On schedule</span>
+                {% endif %}
+                </div>
+            </li>
+            </ul>
+            {% else %}
+            <div class="alert alert-info alert-icon">
+                <em class="icon ni ni-info"></em>
+                <div>
+                    <strong>Baseline not locked yet.</strong>
+                    <p class="mb-0 fs-7 mt-1">
+                    The <strong>baseline schedule</strong> records the originally planned start and end dates —
+                    once locked, any drift from these dates is tracked as schedule variance.
+                    The <strong>baseline budget</strong> captures the approved cost at project start,
+                    allowing spend to be measured against the original plan throughout the project lifecycle.
+                    Baseline is locked automatically when the project moves to <strong>Active</strong>.
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card card-bordered h-100">
+        <div class="card-inner">
+            <h6 class="card-title mb-3">Budget</h6>
+            {% if project.baseline_budget %}
+            <ul class="data-list is-compact">
+            <li class="data-item">
+                <div class="data-col"><span class="data-label text-muted">Baseline Budget</span></div>
+                <div class="data-col"><span class="data-value">${{ project.baseline_budget|floatformat:0 }}</span></div>
+            </li>
+            <li class="data-item">
+                <div class="data-col"><span class="data-label text-muted">Spent to Date</span></div>
+                <div class="data-col"><span class="data-value">${{ total_actual_cost|floatformat:0 }}</span></div>
+            </li>
+            <li class="data-item">
+                <div class="data-col"><span class="data-label text-muted">Remaining</span></div>
+                <div class="data-col">
+                <span class="data-value {% if budget_remaining < 0 %}text-danger{% else %}text-success{% endif %}">
+                    ${{ budget_remaining|floatformat:0 }}
+                </span>
+                </div>
+            </li>
+            {% if budget_variance_pct is not None %}
+            <li class="data-item">
+                <div class="data-col"><span class="data-label text-muted">Budget Used</span></div>
+                <div class="data-col">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="progress flex-grow-1" style="height:5px; min-width:80px;">
+                    <div class="progress-bar {% if budget_variance_pct > 90 %}bg-danger{% elif budget_variance_pct > 70 %}bg-warning{% else %}bg-success{% endif %}"
+                        style="width:{% if budget_variance_pct > 100 %}100{% else %}{{ budget_variance_pct }}{% endif %}%">
+                    </div>
+                    </div>
+                    <span class="fs-7 text-muted">{{ budget_variance_pct|floatformat:1 }}%</span>
+                </div>
+                </div>
+            </li>
+            {% endif %}
+            </ul>
+            {% else %}
+            <div class="text-center py-4 text-muted">
+            <em class="icon ni ni-coins fs-2 d-block mb-2"></em>
+            <p>No baseline budget locked yet.</p>
+            </div>
+            {% endif %}
+        </div>
+        </div>
+    </div>
+
+    {% if project.baseline_locked %}
+    <div class="col-12">
+        <div class="alert alert-success alert-icon">
+        <em class="icon ni ni-lock-alt"></em>
+        Baseline was locked when this project moved to <strong>Active</strong>. Original start, end, and budget are frozen and will not change.
+        </div>
+    </div>
+    {% endif %}
+
+    </div>
+</div>

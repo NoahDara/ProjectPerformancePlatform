@@ -35,7 +35,7 @@
       <tbody>
         {% for obj in projects %}
         <tr>
-          <td><a href="{% url 'project-detail' obj.pk %}">{{ obj.project_number }}</a></td>
+          <td><a href="{% url 'project-details' obj.pk %}">{{ obj.project_number }}</a></td>
           <td>{{ obj.name }}</td>
           <td>{{ obj.get_project_type_display }}</td>
           <td>{{ obj.client.name|default:"-" }}</td>

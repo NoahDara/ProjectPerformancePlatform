@@ -1,0 +1,135 @@
+<div class="tab-pane fade" id="pane-tasks" role="tabpanel">
+    <div class="row g-gs mt-1">
+    <div class="col-12">
+        <div class="card card-bordered">
+        <div class="card-inner">
+            <div class="card-title-group mb-3">
+            <h6 class="card-title">All Tasks</h6>
+            </div>
+
+            {# Discipline filter pills #}
+            {% if project.disciplines.exists %}
+            <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+            <span class="fs-7 text-muted">Filter by discipline:</span>
+            <button class="btn btn-xs btn-primary task-filter-btn" data-discipline="all">All</button>
+            {% for pd in project.disciplines.all %}
+            <button class="btn btn-xs btn-outline-primary task-filter-btn" data-discipline="{{ pd.pk }}">
+                {{ pd.discipline.name }}
+            </button>
+            {% endfor %}
+            </div>
+            {% endif %}
+
+            {# Tasks grouped by discipline #}
+            {% for pd in project.disciplines.all %}
+            {% with tasks=pd.tasks.all %}
+            {% if tasks %}
+            <div class="mb-4 task-group" data-discipline="{{ pd.pk }}">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge bg-primary text-white">{{ pd.discipline.name }}</span>
+                <span class="text-muted fs-7">{{ tasks.count }} task{{ tasks.count|pluralize }}</span>
+                </div>
+                <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Task</th>
+                        <th>Assigned To</th>
+                        <th>Type</th>
+                        <th>Weight</th>
+                        <th>Planned Dates</th>
+                        <th>Progress</th>
+                        <th>Budgeted Cost</th>
+                        <th>Actual Cost</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td>
+                        <span class="fw-medium text-dark">{{ task.name }}</span>
+                        {% if task.description %}
+                        <p class="text-muted fs-7 mb-0">{{ task.description|truncatechars:60 }}</p>
+                        {% endif %}
+                        </td>
+                        <td>
+                        {% if task.assigned_to %}cost
+                        <div class="d-flex align-items-center gap-1">
+                            <div class="user-avatar user-avatar-xs bg-info text-white">
+                            {{ task.assigned_to.first_name|first }}{{ task.assigned_to.last_name|first }}
+                            </div>
+                            <span class="fs-7">{{ task.assigned_to.get_full_name }}</span>
+                        </div>
+                        {% else %}
+                        <span class="text-muted fs-7">—</span>
+                        {% endif %}
+                        </td>
+                        <td>
+                        <span class="badge bg-light text-dark border fs-7">{{ task.get_measurement_type_display }}</span>
+                        </td>
+                        <td class="text-muted fs-7">{{ task.weight }}%</td>
+                        <td class="fs-7 text-muted">
+                        {{ task.planned_start|date:"d M" }} – {{ task.planned_end|date:"d M Y" }}
+                        </td>
+                        <td style="min-width:120px;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="progress flex-grow-1" style="height:4px;">
+                            <div class="progress-bar
+                                {% if task.percent_complete >= 100 %}bg-success
+                                {% elif task.percent_complete >= 50 %}bg-info
+                                {% else %}bg-warning{% endif %}"
+                                style="width:{{ task.percent_complete }}%">
+                            </div>
+                            </div>
+                            <span class="fs-7 text-muted" style="min-width:30px;">{{ task.percent_complete }}%</span>
+                        </div>
+                        </td>
+                        <td class="fs-7">${{ task.budgeted_cost|floatformat:0 }}</td>
+                        <td class="fs-7">
+                        {% if task.total_actual_cost %}
+                        <span class="{% if task.total_actual_cost > task.budgeted_cost %}text-danger{% else %}text-success{% endif %}">
+                            ${{ task.total_actual_cost|floatformat:0 }}
+                        </span>
+                        {% else %}
+                        <span class="text-muted">—</span>
+                        {% endif %}
+                        </td>
+                        <td>
+                        <div class="dropdown">
+                            <a href="#" class="dropdown-toggle btn btn-icon btn-xs btn-light" data-bs-toggle="dropdown">
+                            <em class="icon ni ni-more-h"></em>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                            <ul class="link-list-opt no-bdr">
+                                <li>
+                                <a href="#"><em class="icon ni ni-plus-circle"></em><span>Log Update</span></a>
+                                </li>
+                                <li>
+                                <a href="#"><em class="icon ni ni-edit"></em><span>Edit Task</span></a>
+                                </li>
+                            </ul>
+                            </div>
+                        </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+            {% endif %}
+            {% endwith %}
+            {% empty %}
+            <div class="text-center py-5 text-muted">
+            <em class="icon ni ni-list-check fs-1 d-block mb-2"></em>
+            <p>No tasks have been added to this project yet.</p>
+            <a href="#" class="btn btn-primary mt-2">Add First Task</a>
+            </div>
+            {% endfor %}
+
+        </div>
+        </div>
+    </div>
+    </div>
+</div>

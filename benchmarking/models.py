@@ -16,11 +16,11 @@ class ProjectSnapshot(BaseModel):
     actual_duration = models.PositiveIntegerField(
         help_text="Actual project duration in days."
     )
-    final_spi = models.DecimalField(max_digits=5, decimal_places=3)
-    final_cpi = models.DecimalField(max_digits=5, decimal_places=3)
+    final_spi = models.FloatField()
+    final_cpi = models.FloatField()
     team_size = models.PositiveIntegerField()
-    final_cost = models.DecimalField(max_digits=12, decimal_places=2)
-    budget_at_completion = models.DecimalField(max_digits=12, decimal_places=2)
+    final_cost = models.FloatField()
+    budget_at_completion = models.FloatField()
 
     class Meta(BaseModel.Meta):
         verbose_name = "Project Snapshot"

@@ -13,7 +13,7 @@ class Project(BaseModel):
     ]
     STATUS_CHOICES = [
         ('planning', 'Planning'),
-        ('active', 'Active'),
+        ('in_progress', 'IN Progress'),
         ('on_hold', 'On Hold'),
         ('completed', 'Completed'),
     ]
@@ -45,7 +45,7 @@ class Project(BaseModel):
     # Baseline fields — locked at project start, never updated
     baseline_start_date = models.DateField(null=True, blank=True)
     baseline_end_date = models.DateField(null=True, blank=True)
-    baseline_budget = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    baseline_budget = models.FloatField(null=True, blank=True)
     baseline_locked = models.BooleanField(default=False)
 
     # Current/live fields — updated as project evolves
@@ -59,6 +59,12 @@ class Project(BaseModel):
 
     def __str__(self):
         return f"{self.project_number} — {self.name}"
+    
+    def save(self, *args, **kwargs):
+        if self.status == "in_progress" and not self.baseline_locked:
+            self.lock_baseline()
+        super().save(*args, **kwargs)
+
 
     def lock_baseline(self):
         """
@@ -71,6 +77,10 @@ class Project(BaseModel):
             self.baseline_budget = self.budget
             self.baseline_locked = True
             self.save()
+            
+    @property
+    def budget(self):
+        return sum(obj.budget_allocated for obj in self.disciplines.all())
 
 
 class ProjectDiscipline(BaseModel):
@@ -91,12 +101,8 @@ class ProjectDiscipline(BaseModel):
         blank=True,
         related_name="led_disciplines"
     )
-    planned_weight = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        help_text="Weight of this discipline as % of total project. All disciplines must sum to 100."
-    )
-    budget_allocated = models.DecimalField(max_digits=12, decimal_places=2)
+    planned_weight = models.FloatField(help_text="Weight of this discipline as % of total project. All disciplines must sum to 100.")
+    budget_allocated = models.FloatField()
 
     class Meta(BaseModel.Meta):
         verbose_name = "Project Discipline"

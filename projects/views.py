@@ -1,7 +1,7 @@
 from helpers.views import SafeListView, SafeUpdateView, SafeDeleteView, ToggleActiveView
 from .models import Project, ProjectDiscipline
 from .forms import ProjectForm, ProjectDisciplineForm
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, TemplateView
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.forms import modelformset_factory
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import get_object_or_404, render, redirect
-
+from django.http import HttpResponseRedirect
 
 class ProjectListView(LoginRequiredMixin, SafeListView):
     model = Project
@@ -52,8 +52,6 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
             pd.percent_complete * float(pd.planned_weight) / 100
             for pd in disciplines
         ), 1)
-
-        # Budget figures
         ctx['total_actual_cost'] = sum(
             t.total_actual_cost
             for pd in disciplines for t in pd.tasks.filter(is_active=True)
@@ -63,17 +61,11 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
             ctx['total_actual_cost'] / float(project.baseline_budget) * 100
             if project.baseline_budget else None
         )
-
-        # Schedule variance (days)
         if project.baseline_end_date:
             ctx['schedule_variance'] = (project.planned_end_date - project.baseline_end_date).days
         else:
             ctx['schedule_variance'] = 0
-
-        # Days remaining
         ctx['days_remaining'] = (project.planned_end_date - timezone.now().date()).days
-
-        # Expense summaries
         expenses = project.expenses.all()
         ctx['expense_total'] = expenses.aggregate(t=Sum('amount'))['t'] or 0
         ctx['expense_confirmed'] = expenses.filter(status='Confirmed').aggregate(t=Sum('amount'))['t'] or 0
@@ -92,7 +84,7 @@ class ProjectToggleActiveView(LoginRequiredMixin, ToggleActiveView):
 
 
 class ProjectDisciplineUpdateView(LoginRequiredMixin, View):
-    template_name = "projects/disciplines.html"
+    template_name = "projects/disciplines/update.html"
 
     def get_project(self, pk):
         return get_object_or_404(Project, pk=pk)
@@ -125,9 +117,19 @@ class ProjectDisciplineUpdateView(LoginRequiredMixin, View):
         if formset.is_valid():
             formset.save()
             messages.success(request, "Disciplines updated successfully.")
-            return redirect(reverse("project-detail", kwargs={"pk": pk}))
+            return redirect(reverse("project-details", kwargs={"pk": pk}))
 
         return render(request, self.template_name, {
             "project": project,
             "formset": formset,
         })
+        
+class ProjectToggleStatusView(View):
+    def post(self, request, pk, *args, **kwargs):
+        project = get_object_or_404(Project, pk=pk)
+        status = request.POST.get("status")
+        if status in dict(Project.STATUS_CHOICES):        
+            project.status = status
+            project.save(update_fields=["status"])
+        messages.info(request, f"Project status updated successfully to {project.get_status_display()}")
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER") or "/")

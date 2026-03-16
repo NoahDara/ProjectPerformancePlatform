@@ -36,35 +36,21 @@ class Task(BaseModel):
     # Scheduling
     planned_start = models.DateField()
     planned_end = models.DateField()
-    planned_hours = models.DecimalField(max_digits=8, decimal_places=2)
-    budgeted_cost = models.DecimalField(max_digits=10, decimal_places=2)
+    planned_hours = models.FloatField(null=True, blank=True)
+    budgeted_cost = models.FloatField()
 
     # Weight within its discipline — all tasks per discipline must sum to 100
-    weight = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        help_text="% weight of this task within its discipline. All tasks must sum to 100."
-    )
-
+    weight = models.FloatField(help_text="% weight of this task within its discipline. All tasks must sum to 100.")
     # Measurement configuration
     measurement_type = models.CharField(
         max_length=20,
         choices=MEASUREMENT_CHOICES,
         default='percentage'
     )
-    target_value = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Target quantity for units/linear/hours types. Leave blank for percentage and lump sum."
-    )
-    unit_label = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        help_text="Label for the unit of measure e.g. 'piles', 'metres', 'hours'."
-    )
+    target_value = models.FloatField(null=True,blank=True,
+        help_text="Target quantity for units/linear/hours types. Leave blank for percentage and lump sum.")
+    unit_label = models.CharField(max_length=50, blank=True, null=True,
+        help_text="Label for the unit of measure e.g. 'piles', 'metres', 'hours'.")
 
     class Meta(BaseModel.Meta):
         verbose_name = "Task"
@@ -165,20 +151,14 @@ class TaskUpdate(BaseModel):
         related_name="submitted_updates"
     )
     date = models.DateField()
-    value_achieved = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
+    value_achieved = models.FloatField(
         help_text=(
             "For units/linear/hours: quantity achieved THIS session (additive). "
             "For percentage: new cumulative % complete (latest wins). "
             "For lump_sum: 1 = done, 0 = not done."
         )
     )
-    actual_cost = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        help_text="Actual cost incurred during this update session."
-    )
+    actual_cost = models.FloatField(help_text="Actual cost incurred during this update session.")
     notes = models.TextField(blank=True, null=True)
 
     class Meta(BaseModel.Meta):
