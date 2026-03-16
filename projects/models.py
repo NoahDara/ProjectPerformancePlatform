@@ -17,7 +17,10 @@ class Project(BaseModel):
         ('on_hold', 'On Hold'),
         ('completed', 'Completed'),
     ]
-
+    
+    project_number = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=255)
+    project_type = models.CharField(max_length=50, choices=PROJECT_TYPE_CHOICES)
     branch = models.ForeignKey(
         "branches.Branch",
         on_delete=models.SET_NULL,
@@ -37,29 +40,18 @@ class Project(BaseModel):
         blank=True,
         related_name="managed_projects"
     )
-    deputy_manager = models.ForeignKey(
-        Employee,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="deputy_projects"
-    )
-    name = models.CharField(max_length=255)
-    project_number = models.CharField(max_length=50, unique=True)
-    project_type = models.CharField(max_length=50, choices=PROJECT_TYPE_CHOICES)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='planning')
 
     # Baseline fields — locked at project start, never updated
-    baseline_start_date = models.DateField()
-    baseline_end_date = models.DateField()
-    baseline_budget = models.DecimalField(max_digits=12, decimal_places=2)
+    baseline_start_date = models.DateField(null=True, blank=True)
+    baseline_end_date = models.DateField(null=True, blank=True)
+    baseline_budget = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     baseline_locked = models.BooleanField(default=False)
 
     # Current/live fields — updated as project evolves
     start_date = models.DateField()
     planned_end_date = models.DateField()
     actual_end_date = models.DateField(null=True, blank=True)
-    budget = models.DecimalField(max_digits=12, decimal_places=2)
 
     class Meta(BaseModel.Meta):
         verbose_name = "Project"
@@ -67,13 +59,6 @@ class Project(BaseModel):
 
     def __str__(self):
         return f"{self.project_number} — {self.name}"
-
-    def clean(self):
-        if self.project_manager and self.deputy_manager:
-            if self.project_manager == self.deputy_manager:
-                raise ValidationError(
-                    "Project Manager and Deputy Manager cannot be the same employee."
-                )
 
     def lock_baseline(self):
         """
@@ -99,7 +84,7 @@ class ProjectDiscipline(BaseModel):
         on_delete=models.CASCADE,
         related_name="project_disciplines"
     )
-    lead = models.ForeignKey(
+    manager = models.ForeignKey(
         Employee,
         on_delete=models.SET_NULL,
         null=True,
@@ -122,12 +107,12 @@ class ProjectDiscipline(BaseModel):
         return f"{self.discipline.name} — {self.project.name}"
 
     def clean(self):
-        # Lead must belong to this discipline
-        if self.lead and self.lead.position:
-            if self.lead.position.discipline != self.discipline:
+        # Manager must belong to this discipline
+        if self.manager and self.manager.position:
+            if self.manager.position.discipline != self.discipline:
                 raise ValidationError(
-                    f"{self.lead.full_name} belongs to "
-                    f"{self.lead.discipline} and cannot lead "
+                    f"{self.manager.full_name} belongs to "
+                    f"{self.manager.discipline} and cannot manager "
                     f"{self.discipline.name} on this project."
                 )
 
