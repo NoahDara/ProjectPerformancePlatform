@@ -1,0 +1,709 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}{{ project.project_number }} — {{ project.name }}{% endblock %}
+
+{% block page_title %}{{ project.name }}{% endblock %}
+{% block page_sub_title %}{{ project.project_number }} &nbsp;·&nbsp; {{ project.get_project_type_display }} &nbsp;·&nbsp; {{ project.branch }}{% endblock %}
+
+{% block actions %}
+  <li>
+    <a href="" class="btn btn-white btn-dim btn-outline-primary">
+      <em class="icon ni ni-download-cloud"></em>
+      <span>Export</span>
+    </a>
+  </li>
+  {% if project.status == 'planning' %}
+  <li>
+    <a href="" class="btn btn-white btn-dim btn-outline-warning">
+      <em class="icon ni ni-lock-alt"></em>
+      <span>Lock Baseline</span>
+    </a>
+  </li>
+  {% endif %}
+  <li class="nk-block-tools-opt">
+    <div class="dropdown">
+      <a href="#" class="dropdown-toggle btn btn-icon btn-primary" data-bs-toggle="dropdown">
+        <em class="icon ni ni-plus"></em>
+      </a>
+      <div class="dropdown-menu dropdown-menu-end">
+        <ul class="link-list-opt no-bdr">
+          <li>
+            <a href="">
+              <em class="icon ni ni-edit"></em>
+              <span>Edit Project</span>
+            </a>
+          </li>
+          <li>
+            <a href="">
+              <em class="icon ni ni-layers"></em>
+              <span>Add Discipline</span>
+            </a>
+          </li>
+          <li>
+            <a href="">
+              <em class="icon ni ni-coin-alt"></em>
+              <span>Log Expense</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </li>
+{% endblock %}
+
+{% block content %}
+
+{# ─── Summary metric cards ─────────────────────────────────────────────── #}
+<div class="col-12">
+  <div class="row g-3 mb-2">
+
+    <div class="col-6 col-sm-3">
+      <div class="card card-bordered h-100">
+        <div class="card-inner">
+          <div class="nk-wg-action">
+            <div class="nk-wg-action-content">
+              <em class="icon ni ni-activity-round-fill fs-2 text-primary mb-2 d-block"></em>
+              <div class="title h6 text-muted fw-normal mb-0">Overall Progress</div>
+              <p class="fs-2 fw-bold mb-0 text-dark">{{ overall_progress }}%</p>
+            </div>
+          </div>
+          <div class="progress mt-2" style="height:5px;">
+            <div class="progress-bar bg-primary" style="width:{{ overall_progress }}%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-sm-3">
+      <div class="card card-bordered h-100">
+        <div class="card-inner">
+          <div class="nk-wg-action">
+            <div class="nk-wg-action-content">
+              <em class="icon ni ni-coins fs-2 text-warning mb-2 d-block"></em>
+              <div class="title h6 text-muted fw-normal mb-0">Budget Used</div>
+              <p class="fs-2 fw-bold mb-0 text-dark">${{ total_actual_cost|floatformat:0 }}</p>
+              {% if project.baseline_budget %}
+              <p class="fs-7 text-muted mb-0">of ${{ project.baseline_budget|floatformat:0 }} baseline</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-sm-3">
+      <div class="card card-bordered h-100">
+        <div class="card-inner">
+          <div class="nk-wg-action">
+            <div class="nk-wg-action-content">
+              <em class="icon ni ni-calendar-alt fs-2 text-info mb-2 d-block"></em>
+              <div class="title h6 text-muted fw-normal mb-0">Days Remaining</div>
+              <p class="fs-2 fw-bold mb-0 text-dark">{{ days_remaining }}</p>
+              <p class="fs-7 text-muted mb-0">Due {{ project.planned_end_date|date:"d M Y" }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-sm-3">
+      <div class="card card-bordered h-100">
+        <div class="card-inner">
+          <div class="nk-wg-action">
+            <div class="nk-wg-action-content">
+              {% if schedule_variance > 0 %}
+              <em class="icon ni ni-trend-up fs-2 text-danger mb-2 d-block"></em>
+              {% elif schedule_variance < 0 %}
+              <em class="icon ni ni-trend-down fs-2 text-success mb-2 d-block"></em>
+              {% else %}
+              <em class="icon ni ni-check-circle fs-2 text-success mb-2 d-block"></em>
+              {% endif %}
+              <div class="title h6 text-muted fw-normal mb-0">Schedule Variance</div>
+              {% if schedule_variance > 0 %}
+                <p class="fs-2 fw-bold mb-0 text-danger">+{{ schedule_variance }} days</p>
+              {% elif schedule_variance < 0 %}
+                <p class="fs-2 fw-bold mb-0 text-success">{{ schedule_variance }} days</p>
+              {% else %}
+                <p class="fs-2 fw-bold mb-0 text-success">On track</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{# ─── Status + type badges row ─────────────────────────────────────────── #}
+<div class="col-12">
+  <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+    {% if project.status == 'active' %}
+      <span class="badge bg-success text-white"><em class="icon ni ni-circle-fill me-1" style="font-size:8px;"></em>Active</span>
+    {% elif project.status == 'planning' %}
+      <span class="badge bg-info text-white"><em class="icon ni ni-circle-fill me-1" style="font-size:8px;"></em>Planning</span>
+    {% elif project.status == 'on_hold' %}
+      <span class="badge bg-warning text-white"><em class="icon ni ni-circle-fill me-1" style="font-size:8px;"></em>On Hold</span>
+    {% elif project.status == 'completed' %}
+      <span class="badge bg-secondary text-white"><em class="icon ni ni-circle-fill me-1" style="font-size:8px;"></em>Completed</span>
+    {% endif %}
+    <span class="badge bg-outline-primary text-primary border border-primary">{{ project.get_project_type_display }}</span>
+    {% if project.baseline_locked %}
+      <span class="badge bg-light text-muted border"><em class="icon ni ni-lock-alt me-1"></em>Baseline Locked</span>
+    {% else %}
+      <span class="badge bg-light text-warning border border-warning"><em class="icon ni ni-lock-alt-fill me-1"></em>Baseline Not Locked</span>
+    {% endif %}
+  </div>
+</div>
+
+{# ─── Tab navigation ───────────────────────────────────────────────────── #}
+<div class="col-12">
+  <ul class="nav nav-tabs nav-tabs-mb-icon nav-tabs-card" id="projectTabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="tab-overview" data-bs-toggle="tab" href="#pane-overview" role="tab">
+        <em class="icon ni ni-home-alt"></em><span>Overview</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="tab-disciplines" data-bs-toggle="tab" href="#pane-disciplines" role="tab">
+        <em class="icon ni ni-layers"></em><span>Disciplines</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="tab-expenses" data-bs-toggle="tab" href="#pane-expenses" role="tab">
+        <em class="icon ni ni-coins"></em><span>Expenses</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="tab-baseline" data-bs-toggle="tab" href="#pane-baseline" role="tab">
+        <em class="icon ni ni-target"></em><span>Baseline</span>
+      </a>
+    </li>
+  </ul>
+</div>
+
+{# ─────────────────────────────────────────────────────────────────────── #}
+{# TAB PANES                                                               #}
+{# ─────────────────────────────────────────────────────────────────────── #}
+<div class="col-12">
+  <div class="tab-content" id="projectTabContent">
+
+    {# ── OVERVIEW ─────────────────────────────────────────────────────── #}
+    <div class="tab-pane fade show active" id="pane-overview" role="tabpanel">
+      <div class="row g-gs mt-1">
+
+        {# Project details card #}
+        <div class="col-lg-4">
+          <div class="card card-bordered h-100">
+            <div class="card-inner">
+              <div class="card-title-group mb-3">
+                <h6 class="card-title">Project Details</h6>
+              </div>
+              <ul class="data-list is-compact">
+                <li class="data-item">
+                  <div class="data-col"><span class="data-label text-muted">Project Number</span></div>
+                  <div class="data-col"><span class="data-value fw-medium">{{ project.project_number }}</span></div>
+                </li>
+                <li class="data-item">
+                  <div class="data-col"><span class="data-label text-muted">Project Manager</span></div>
+                  <div class="data-col">
+                    {% if project.project_manager %}
+                    <span class="data-value fw-medium d-flex align-items-center gap-1">
+                      <div class="user-avatar user-avatar-xs bg-primary text-white">
+                        {{ project.project_manager.first_name|first }}{{ project.project_manager.last_name|first }}
+                      </div>
+                      {{ project.project_manager.get_full_name }}
+                    </span>
+                    {% else %}
+                    <span class="data-value text-muted">Unassigned</span>
+                    {% endif %}
+                  </div>
+                </li>
+                <li class="data-item">
+                  <div class="data-col"><span class="data-label text-muted">Client</span></div>
+                  <div class="data-col"><span class="data-value fw-medium">{% if project.client %}{{ project.client }}{% else %}—{% endif %}</span></div>
+                </li>
+                <li class="data-item">
+                  <div class="data-col"><span class="data-label text-muted">Branch</span></div>
+                  <div class="data-col"><span class="data-value fw-medium">{% if project.branch %}{{ project.branch }}{% else %}—{% endif %}</span></div>
+                </li>
+                <li class="data-item">
+                  <div class="data-col"><span class="data-label text-muted">Start Date</span></div>
+                  <div class="data-col"><span class="data-value">{{ project.start_date|date:"d M Y" }}</span></div>
+                </li>
+                <li class="data-item">
+                  <div class="data-col"><span class="data-label text-muted">Planned End</span></div>
+                  <div class="data-col"><span class="data-value">{{ project.planned_end_date|date:"d M Y" }}</span></div>
+                </li>
+                <li class="data-item">
+                  <div class="data-col"><span class="data-label text-muted">Actual End</span></div>
+                  <div class="data-col"><span class="data-value">{% if project.actual_end_date %}{{ project.actual_end_date|date:"d M Y" }}{% else %}<span class="text-muted">In progress</span>{% endif %}</span></div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {# Discipline progress card #}
+        <div class="col-lg-8">
+          <div class="card card-bordered h-100">
+            <div class="card-inner">
+              <div class="card-title-group mb-3">
+                <h6 class="card-title">Discipline Progress</h6>
+                <div class="card-tools">
+                  <a href="#pane-disciplines" class="btn btn-xs btn-light" id="goToDisciplines">View all</a>
+                </div>
+              </div>
+              {% for pd in project.disciplines.all %}
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <div>
+                    <span class="fw-medium text-dark">{{ pd.discipline.name }}</span>
+                    <span class="text-muted fs-7 ms-1">
+                      — weight {{ pd.planned_weight }}%
+                      {% if pd.manager %}&nbsp;·&nbsp; {{ pd.manager.get_full_name }}{% endif %}
+                    </span>
+                  </div>
+                  <span class="badge
+                    {% if pd.percent_complete >= 100 %}bg-success
+                    {% elif pd.percent_complete >= 60 %}bg-info
+                    {% elif pd.percent_complete >= 30 %}bg-warning
+                    {% else %}bg-secondary{% endif %}
+                    text-white">
+                    {{ pd.percent_complete }}%
+                  </span>
+                </div>
+                <div class="progress" style="height:6px;">
+                  <div class="progress-bar
+                    {% if pd.percent_complete >= 100 %}bg-success
+                    {% elif pd.percent_complete >= 60 %}bg-info
+                    {% elif pd.percent_complete >= 30 %}bg-warning
+                    {% else %}bg-secondary{% endif %}"
+                    style="width:{{ pd.percent_complete }}%">
+                  </div>
+                </div>
+              </div>
+              {% empty %}
+              <div class="text-center py-4 text-muted">
+                <em class="icon ni ni-layers fs-2 d-block mb-2"></em>
+                <p>No disciplines added yet.</p>
+                <a href="" class="btn btn-sm btn-primary">Add Discipline</a>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    {# ── DISCIPLINES ──────────────────────────────────────────────────── #}
+    <div class="tab-pane fade" id="pane-disciplines" role="tabpanel">
+      <div class="row g-gs mt-1">
+        {% for pd in project.disciplines.all %}
+        <div class="col-12">
+          <div class="card card-bordered">
+            <div class="card-inner">
+              <div class="row align-items-start g-3">
+
+                {# Header row #}
+                <div class="col-12">
+                  <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                    <div>
+                      <h6 class="mb-0 fw-bold">{{ pd.discipline.name }}</h6>
+                      <p class="text-muted fs-7 mb-0">
+                        Manager:
+                        {% if pd.manager %}{{ pd.manager.get_full_name }}{% else %}<span class="text-muted">Unassigned</span>{% endif %}
+                        &nbsp;·&nbsp; Weight: {{ pd.planned_weight }}%
+                        &nbsp;·&nbsp; Budget: ${{ pd.budget_allocated|floatformat:0 }}
+                      </p>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="badge bg-primary text-white fs-6 px-3 py-2">{{ pd.percent_complete }}% complete</span>
+                      <a href="" class="btn btn-sm btn-outline-primary">
+                        <em class="icon ni ni-plus"></em> Add Task
+                      </a>
+                    </div>
+                  </div>
+                  <div class="progress mt-2 mb-3" style="height:5px;">
+                    <div class="progress-bar bg-primary" style="width:{{ pd.percent_complete }}%"></div>
+                  </div>
+                </div>
+
+                {# Tasks table #}
+                <div class="col-12">
+                  {% with tasks=pd.tasks.all %}
+                  {% if tasks %}
+                  <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Task</th>
+                          <th>Assigned To</th>
+                          <th>Type</th>
+                          <th>Weight</th>
+                          <th>Planned</th>
+                          <th>Progress</th>
+                          <th>Budgeted Cost</th>
+                          <th>Actual Cost</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for task in tasks %}
+                        <tr>
+                          <td>
+                            <span class="fw-medium text-dark">{{ task.name }}</span>
+                            {% if task.description %}
+                            <p class="text-muted fs-7 mb-0">{{ task.description|truncatechars:60 }}</p>
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if task.assigned_to %}
+                            <div class="d-flex align-items-center gap-1">
+                              <div class="user-avatar user-avatar-xs bg-info text-white">
+                                {{ task.assigned_to.first_name|first }}{{ task.assigned_to.last_name|first }}
+                              </div>
+                              <span class="fs-7">{{ task.assigned_to.get_full_name }}</span>
+                            </div>
+                            {% else %}
+                            <span class="text-muted fs-7">—</span>
+                            {% endif %}
+                          </td>
+                          <td>
+                            <span class="badge bg-light text-dark border fs-7">{{ task.get_measurement_type_display }}</span>
+                          </td>
+                          <td class="text-muted fs-7">{{ task.weight }}%</td>
+                          <td class="fs-7 text-muted">
+                            {{ task.planned_start|date:"d M" }} – {{ task.planned_end|date:"d M Y" }}
+                          </td>
+                          <td style="min-width:120px;">
+                            <div class="d-flex align-items-center gap-2">
+                              <div class="progress flex-grow-1" style="height:4px;">
+                                <div class="progress-bar
+                                  {% if task.percent_complete >= 100 %}bg-success
+                                  {% elif task.percent_complete >= 50 %}bg-info
+                                  {% else %}bg-warning{% endif %}"
+                                  style="width:{{ task.percent_complete }}%">
+                                </div>
+                              </div>
+                              <span class="fs-7 text-muted" style="min-width:30px;">{{ task.percent_complete }}%</span>
+                            </div>
+                          </td>
+                          <td class="fs-7">${{ task.budgeted_cost|floatformat:0 }}</td>
+                          <td class="fs-7">
+                            {% if task.total_actual_cost %}
+                            <span class="{% if task.total_actual_cost > task.budgeted_cost %}text-danger{% else %}text-success{% endif %}">
+                              ${{ task.total_actual_cost|floatformat:0 }}
+                            </span>
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                          </td>
+                          <td>
+                            <div class="dropdown">
+                              <a href="#" class="dropdown-toggle btn btn-icon btn-xs btn-light" data-bs-toggle="dropdown">
+                                <em class="icon ni ni-more-h"></em>
+                              </a>
+                              <div class="dropdown-menu dropdown-menu-end">
+                                <ul class="link-list-opt no-bdr">
+                                  <li>
+                                    <a href="">
+                                      <em class="icon ni ni-plus-circle"></em><span>Log Update</span>
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a href="">
+                                      <em class="icon ni ni-edit"></em><span>Edit Task</span>
+                                    </a>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                  {% else %}
+                  <div class="text-center py-3 text-muted">
+                    <p class="fs-7 mb-1">No tasks added to this discipline yet.</p>
+                    <a href="" class="btn btn-xs btn-primary">Add First Task</a>
+                  </div>
+                  {% endif %}
+                  {% endwith %}
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+          <div class="card card-bordered">
+            <div class="card-inner text-center py-5 text-muted">
+              <em class="icon ni ni-layers fs-1 d-block mb-2"></em>
+              <p>No disciplines have been added to this project.</p>
+              <a href="" class="btn btn-primary mt-2">Add Discipline</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# ── EXPENSES ─────────────────────────────────────────────────────── #}
+    <div class="tab-pane fade" id="pane-expenses" role="tabpanel">
+      <div class="row g-gs mt-1">
+
+        {# Expense summary metrics #}
+        <div class="col-sm-4">
+          <div class="card card-bordered">
+            <div class="card-inner">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <em class="icon ni ni-coins fs-4 text-primary"></em>
+                <span class="text-muted fs-7">Total Logged</span>
+              </div>
+              <p class="fs-3 fw-bold mb-0">${{ expense_total|floatformat:0 }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="card card-bordered">
+            <div class="card-inner">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <em class="icon ni ni-check-circle fs-4 text-success"></em>
+                <span class="text-muted fs-7">Confirmed</span>
+              </div>
+              <p class="fs-3 fw-bold mb-0 text-success">${{ expense_confirmed|floatformat:0 }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="card card-bordered">
+            <div class="card-inner">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <em class="icon ni ni-clock fs-4 text-warning"></em>
+                <span class="text-muted fs-7">Pending Review</span>
+              </div>
+              <p class="fs-3 fw-bold mb-0 text-warning">${{ expense_pending|floatformat:0 }}</p>
+            </div>
+          </div>
+        </div>
+
+        {# Expenses table #}
+        <div class="col-12">
+          <div class="card card-bordered">
+            <div class="card-inner">
+              <div class="card-title-group mb-3">
+                <h6 class="card-title">Expense Entries</h6>
+                <div class="card-tools">
+                  <a href="" class="btn btn-sm btn-primary">
+                    <em class="icon ni ni-plus"></em> Log Expense
+                  </a>
+                </div>
+              </div>
+              {% if project.expenses.exists %}
+              <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Description</th>
+                      <th>Category</th>
+                      <th>Date</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for expense in project.expenses.all|dictsortreversed:"expense_date" %}
+                    <tr>
+                      <td>
+                        <span class="fw-medium">{{ expense.description|default:"—" }}</span>
+                      </td>
+                      <td class="text-muted fs-7">{{ expense.category.name }}</td>
+                      <td class="text-muted fs-7">{{ expense.expense_date|date:"d M Y" }}</td>
+                      <td class="fw-medium">${{ expense.amount|floatformat:0 }}</td>
+                      <td>
+                        {% if expense.status == 'Confirmed' %}
+                          <span class="badge bg-success text-white">Confirmed</span>
+                        {% elif expense.status == 'Submitted' %}
+                          <span class="badge bg-info text-white">Submitted</span>
+                        {% elif expense.status == 'Draft' %}
+                          <span class="badge bg-secondary text-white">Draft</span>
+                        {% elif expense.status == 'Rejected' %}
+                          <span class="badge bg-danger text-white">Rejected</span>
+                        {% elif expense.status == 'Reverted' %}
+                          <span class="badge bg-warning text-dark">Reverted</span>
+                        {% elif expense.status == 'Cancelled' %}
+                          <span class="badge bg-light text-muted border">Cancelled</span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if expense.is_editable %}
+                        <a href="" class="btn btn-icon btn-xs btn-light">
+                          <em class="icon ni ni-edit"></em>
+                        </a>
+                        {% else %}
+                        <a href="" class="btn btn-icon btn-xs btn-light">
+                          <em class="icon ni ni-eye"></em>
+                        </a>
+                        {% endif %}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% else %}
+              <div class="text-center py-5 text-muted">
+                <em class="icon ni ni-coins fs-1 d-block mb-2"></em>
+                <p>No expenses logged for this project.</p>
+                <a href="" class="btn btn-primary mt-2">Log First Expense</a>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    {# ── BASELINE ─────────────────────────────────────────────────────── #}
+    <div class="tab-pane fade" id="pane-baseline" role="tabpanel">
+      <div class="row g-gs mt-1">
+
+        {# Schedule comparison #}
+        <div class="col-lg-6">
+          <div class="card card-bordered h-100">
+            <div class="card-inner">
+              <h6 class="card-title mb-3">Schedule</h6>
+              {% if project.baseline_locked %}
+              <ul class="data-list is-compact">
+                <li class="data-item">
+                  <div class="data-col"><span class="data-label text-muted">Baseline Start</span></div>
+                  <div class="data-col"><span class="data-value">{{ project.baseline_start_date|date:"d M Y" }}</span></div>
+                </li>
+                <li class="data-item">
+                  <div class="data-col"><span class="data-label text-muted">Actual Start</span></div>
+                  <div class="data-col"><span class="data-value">{{ project.start_date|date:"d M Y" }}</span></div>
+                </li>
+                <li class="data-item">
+                  <div class="data-col"><span class="data-label text-muted">Baseline End</span></div>
+                  <div class="data-col"><span class="data-value">{{ project.baseline_end_date|date:"d M Y" }}</span></div>
+                </li>
+                <li class="data-item">
+                  <div class="data-col"><span class="data-label text-muted">Current Planned End</span></div>
+                  <div class="data-col">
+                    <span class="data-value {% if schedule_variance > 0 %}text-danger{% elif schedule_variance < 0 %}text-success{% endif %}">
+                      {{ project.planned_end_date|date:"d M Y" }}
+                    </span>
+                  </div>
+                </li>
+                <li class="data-item">
+                  <div class="data-col"><span class="data-label text-muted">Variance</span></div>
+                  <div class="data-col">
+                    {% if schedule_variance > 0 %}
+                      <span class="data-value text-danger fw-bold">+{{ schedule_variance }} days (delayed)</span>
+                    {% elif schedule_variance < 0 %}
+                      <span class="data-value text-success fw-bold">{{ schedule_variance }} days (ahead)</span>
+                    {% else %}
+                      <span class="data-value text-success fw-bold">On schedule</span>
+                    {% endif %}
+                  </div>
+                </li>
+              </ul>
+              {% else %}
+              <div class="text-center py-4 text-muted">
+                <em class="icon ni ni-lock-alt fs-2 d-block mb-2"></em>
+                <p>Baseline has not been locked yet.</p>
+                <a href="" class="btn btn-sm btn-warning mt-1">Lock Baseline Now</a>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        {# Budget comparison #}
+        <div class="col-lg-6">
+          <div class="card card-bordered h-100">
+            <div class="card-inner">
+              <h6 class="card-title mb-3">Budget</h6>
+              {% if project.baseline_budget %}
+              <ul class="data-list is-compact">
+                <li class="data-item">
+                  <div class="data-col"><span class="data-label text-muted">Baseline Budget</span></div>
+                  <div class="data-col"><span class="data-value">${{ project.baseline_budget|floatformat:0 }}</span></div>
+                </li>
+                <li class="data-item">
+                  <div class="data-col"><span class="data-label text-muted">Spent to Date</span></div>
+                  <div class="data-col"><span class="data-value">${{ total_actual_cost|floatformat:0 }}</span></div>
+                </li>
+                <li class="data-item">
+                  <div class="data-col"><span class="data-label text-muted">Remaining</span></div>
+                  <div class="data-col">
+                    <span class="data-value {% if budget_remaining < 0 %}text-danger{% else %}text-success{% endif %}">
+                      ${{ budget_remaining|floatformat:0 }}
+                    </span>
+                  </div>
+                </li>
+                {% if budget_variance_pct is not None %}
+                <li class="data-item">
+                  <div class="data-col"><span class="data-label text-muted">Budget Used</span></div>
+                  <div class="data-col">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="progress flex-grow-1" style="height:5px; min-width:80px;">
+                        <div class="progress-bar {% if budget_variance_pct > 90 %}bg-danger{% elif budget_variance_pct > 70 %}bg-warning{% else %}bg-success{% endif %}"
+                          style="width:{% if budget_variance_pct > 100 %}100{% else %}{{ budget_variance_pct }}{% endif %}%">
+                        </div>
+                      </div>
+                      <span class="fs-7 text-muted">{{ budget_variance_pct|floatformat:1 }}%</span>
+                    </div>
+                  </div>
+                </li>
+                {% endif %}
+              </ul>
+              {% else %}
+              <div class="text-center py-4 text-muted">
+                <em class="icon ni ni-coins fs-2 d-block mb-2"></em>
+                <p>No baseline budget locked yet.</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        {# Baseline lock info #}
+        {% if project.baseline_locked %}
+        <div class="col-12">
+          <div class="alert alert-success alert-icon">
+            <em class="icon ni ni-lock-alt"></em>
+            Baseline was locked when this project moved to <strong>Active</strong>. Original start, end, and budget are frozen and will not change.
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+  </div>{# end tab-content #}
+</div>
+
+{# ─── Tab link helper ──────────────────────────────────────────────────── #}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var goBtn = document.getElementById('goToDisciplines');
+  if (goBtn) {
+    goBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var tab = document.getElementById('tab-disciplines');
+      if (tab) { tab.click(); }
+    });
+  }
+});
+</script>
+
+{% endblock %}

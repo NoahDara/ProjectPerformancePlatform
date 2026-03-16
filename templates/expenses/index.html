@@ -1,0 +1,373 @@
+{% load role_permissions %}
+{% load currency_tags %}
+<div class="tab-pane" id="expenses">
+    {% if not job.active_invoices %}
+    <div class="alert alert-warning p-4 text-center">
+        <div class="d-flex flex-column align-items-center">
+            <em class="icon ni ni-briefcase text-warning" style="font-size: 3rem;"></em>
+            <h5 class="mt-3">No Expenses Yet</h5>
+            <p class="text-soft">
+                Expenses cannot be recorded until an invoice has been initiated for this Work Order.
+            </p>
+            <p class="text-soft mb-0">
+                To proceed with capturing expenses, please ensure the invoice is initialized first. Once the invoice is active, expense tracking will be enabled.
+            </p>
+        </div>
+    </div>   
+    {% else %}
+    <div class="card card-bordered card-preview">
+        <div class="card-inner">
+          <div class="nk-block-head-content">
+            <div class="nk-block-tools-toggle d-flex justify-content-between align-items-center">
+                <h5 class="card-title text-primary mb-0">🌟 Work Order Expenses Management</h5>
+                <!-- Wrap your buttons in a container with data-responsive-buttons -->
+                {% if request.user|role_has_perm_in:"write_customer_relationship_module" and not job.read_only %}
+                <div class="nk-block-tools g-3 d-flex justify-content-end" data-responsive-buttons data-breakpoint="768">
+                    <div class="nk-block-tools-opt">
+                        <a href="{% url 'expense-create' %}?content_type={{ job.content_type.pk }}&object={{ job.uid }}" class="btn btn-primary responsive-btn">
+                            <em class="icon ni ni-plus-round"></em>
+                            <span>Create New</span>
+                        </a>
+                    </div>
+                    {% if job.draft_expenses %}
+                    <div class="nk-block-tools-opt">
+                        <a href="#" class="btn btn-primary responsive-btn" 
+                           data-bs-toggle="modal" data-bs-target="#confirmPendingExpensesModal">
+                           <em class="icon ni ni-check-circle"></em>
+                            <span>Confirm Pending Expenses</span>
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            <br>
+
+            <table class="datatable-init-export nowrap table" data-export-title="Export">
+                <thead>
+                    <tr>
+                        <th data-priority="1">Expense Reference</th>
+                        <th data-priority="3">Status</th>
+                        <th data-priority="4">Expense Type</th>
+                        <th data-priority="5">Expense Date</th>
+                        <th data-priority="6">Amount</th>
+                        <th data-priority="7">Currency</th>
+                        <th data-priority="8">Recorded By</th>
+                        <th data-priority="9">Proof of Payment</th>
+                        <th data-priority="10">Description</th>
+                        <th data-priority="11">Created</th>
+                        <th data-priority="12">Updated</th>
+                        {% if not job.read_only %}
+                        <th data-priority="2">Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for obj in job.expenses.all %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'expense-details' obj.uid %}">
+                            <strong>{{ obj }}</strong>
+                            </a>
+                        </td>
+                        <td>
+                            <span class="badge bg-info">{{ obj.status }}</span>
+                        </td>
+                        <td>{{ obj.category }}</td>
+                        <td>{{ obj.expense_date|date:"d M Y" }}</td>
+                        <td>{% format_job_currency work orderobj.amount %}</td>
+                        <td>{{ obj.currency.symbol|default:"-" }}</td>
+                        <td>{{ obj.recorded_by|default:"-" }}</td>
+                        <td>
+                            {% if obj.proof_of_payment %}
+                                <a href="{{ obj.proof_of_payment.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <em class="icon ni ni-file-docs"></em>
+                                    <span>View File</span>
+                                </a>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ obj.description|default:"-" }}</td>
+                        <td>{{ obj.created|date:"Y-m-d H:i" }}</td>
+                        <td>{{ obj.updated|date:"Y-m-d H:i" }}</td>
+                        {% if not job.read_only %}
+                        <td>
+                            <div class="dropdown">
+                                <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown">
+                                    <em class="icon ni ni-more-h"></em>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <ul class="link-list-opt no-bdr">
+                                        <li><a href="{% url 'expense-details' obj.uid %}"><em class="icon ni ni-eye"></em><span>View Details</span></a></li>
+                                        {% if request.user|role_has_perm_in:"write_customer_relationship_module" and obj.is_editable %}
+                                        <li><a href="{% url 'expense-update' obj.uid %}"><em class="icon ni ni-edit"></em><span>Edit</span></a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteExpenseModal{{ obj.uid }}"><em class="icon ni ni-trash"></em><span>Delete</span></a></li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% for obj in job.expenses.all %}
+    <!-- Delete Expense Confirmation Modal -->
+    <div class="modal fade" id="deleteExpenseModal{{ obj.uid }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Expense {{ obj }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-warning">This Action is irreversible</p>
+                    <h5>Are You Sure Want To Delete This Expense?</h5>
+                    <div class="mt-3">
+                        <p><strong>Expense Reference:</strong> {{ obj }}</p>
+                        <p><strong>Status:</strong> {{ obj.status }}</p>
+                        <p><strong>Expense Type:</strong> {{ obj.category }}</p>
+                        <p><strong>Expense Date:</strong> {{ obj.expense_date|date:"d M Y" }}</p>
+                        <p><strong>Amount:</strong> {% format_job_currency work orderobj.amount %}</p>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light justify-content-between">
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="{% url 'expense-delete' obj.uid %}" class="btn btn-outline-danger">Yes, Remove</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% endif %}
+</div>
+
+
+
+{% load currency_tags %}
+
+<div class="modal fade" tabindex="-1" id="confirmPendingExpensesModal">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success-dim">
+                <h5 class="modal-title">
+                    <em class="icon ni ni-briefcase me-2"></em>
+                    Confirm Pending Expenses
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% if job.draft_expenses %}
+                <div class="alert alert-info d-flex align-items-center" role="alert">
+                    <em class="icon ni ni-info me-2" style="font-size: 1.5rem;"></em>
+                    <div>
+                        <strong>Expense Confirmation:</strong> Review the pending expenses below before confirming.
+                    </div>
+                </div>
+
+                <!-- Expenses Requiring Approval -->
+                <div class="mb-4">
+                    <h6 class="text-warning mb-3">
+                        <em class="icon ni ni-shield-check me-1"></em>
+                        Expenses Requiring Approval
+                        <span class="badge bg-warning ms-2">
+                            {{ job.draft_expenses_requires_approval|length }}
+                        </span>
+                    </h6>
+                    <div class="alert alert-warning-dim mb-3">
+                        <em class="icon ni ni-alert-circle me-2"></em>
+                        These expenses will be <strong>submitted for approval</strong> to the designated approval group.
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Expense Reference</th>
+                                    <th>Category</th>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Proof</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for expense in job.draft_expenses %}
+                                {% if expense.requires_approval %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'expense-details' expense.uid %}" target="_blank">
+                                            {{ expense }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ expense.category }}</span>
+                                    </td>
+                                    <td>{{ expense.expense_date|date:"d M Y" }}</td>
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ expense.description|truncatewords:10|default:"-" }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ expense.amount|format_currency }}</strong>
+                                        {% if expense.currency != job.currency %}
+                                        <br>
+                                        <small class="text-muted">
+                                            ≈ {% format_job_currency work orderexpense.amount_in_main_currency %}
+                                        </small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning">{{ expense.status }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if expense.proof %}
+                                        <a href="{{ expense.proof.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <em class="icon ni ni-file-download"></em>
+                                        </a>
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Auto-Confirmed Expenses -->
+                <div class="mb-4">
+                    <h6 class="text-success mb-3">
+                        <em class="icon ni ni-check-circle me-1"></em>
+                        Expenses to be Auto-Confirmed
+                        <span class="badge bg-success ms-2">
+                            {{ job.draft_expenses_no_approval|length }}
+                        </span>
+                    </h6>
+                    <div class="alert alert-success-dim mb-3">
+                        <em class="icon ni ni-check-circle me-2"></em>
+                        These expenses will be <strong>automatically confirmed</strong> 
+                        {% if not job.expenses_approval_group %}
+                            as no approval group is set on this job.
+                        {% else %}
+                            as they don't require approval.
+                        {% endif %}
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Expense Reference</th>
+                                    <th>Category</th>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Proof</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for expense in job.draft_expenses %}
+                                {% if not expense.requires_approval %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'expense-details' expense.uid %}" target="_blank">
+                                            {{ expense }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ expense.category }}</span>
+                                    </td>
+                                    <td>{{ expense.expense_date|date:"d M Y" }}</td>
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ expense.description|truncatewords:10|default:"-" }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ expense.amount|format_currency }}</strong>
+                                        {% if expense.currency != job.currency %}
+                                        <br>
+                                        <small class="text-muted">
+                                            ≈ {% format_job_currency work orderexpense.amount_in_main_currency %}
+                                        </small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning">{{ expense.status }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if expense.proof %}
+                                        <a href="{{ expense.proof.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <em class="icon ni ni-file-download"></em>
+                                        </a>
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {% else %}
+                <!-- No Pending Expenses -->
+                <div class="alert alert-warning">
+                    <em class="icon ni ni-alert-circle me-2"></em>
+                    <strong>No Pending Expenses:</strong> There are no draft or pending expenses for this job.
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="modal-footer bg-light justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <em class="icon ni ni-arrow-left"></em>
+                    <span>Cancel</span>
+                </button>
+                {% if job.draft_expenses %}
+                <form method="post" action="{% url 'job-toggle-status' job.uid %}" id="confirmExpensesForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="Confirm Expenses">
+                    <button type="submit" class="btn btn-success" id="confirmExpensesBtn">
+                        <em class="icon ni ni-check-circle"></em>
+                        <span>Confirm All Expenses</span>
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmExpensesForm = document.getElementById('confirmExpensesForm');
+    const confirmExpensesBtn = document.getElementById('confirmExpensesBtn');
+    
+    if (confirmExpensesForm) {
+        confirmExpensesForm.addEventListener('submit', function(e) {
+            if (confirmExpensesBtn.disabled) {
+                e.preventDefault();
+                return false;
+            }
+            
+            confirmExpensesBtn.disabled = true;
+            confirmExpensesBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing Expenses...';
+        });
+    }
+});
+</script>

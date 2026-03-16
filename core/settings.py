@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'projects.apps.ProjectsConfig',
     'roles.apps.RolesConfig',
     'tasks.apps.TasksConfig',
+    'expenses.apps.ExpensesConfig',
     
     #3rd party apps
     "debug_toolbar",

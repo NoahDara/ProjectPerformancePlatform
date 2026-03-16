@@ -40,6 +40,46 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
     template_name = "projects/detail.html"
     context_object_name = "project"
 
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        project = self.object
+        from django.utils import timezone
+        from django.db.models import Sum
+
+        # Overall weighted progress
+        disciplines = project.disciplines.prefetch_related('tasks__updates').all()
+        ctx['overall_progress'] = round(sum(
+            pd.percent_complete * float(pd.planned_weight) / 100
+            for pd in disciplines
+        ), 1)
+
+        # Budget figures
+        ctx['total_actual_cost'] = sum(
+            t.total_actual_cost
+            for pd in disciplines for t in pd.tasks.filter(is_active=True)
+        )
+        ctx['budget_remaining'] = float(project.baseline_budget or 0) - ctx['total_actual_cost']
+        ctx['budget_variance_pct'] = (
+            ctx['total_actual_cost'] / float(project.baseline_budget) * 100
+            if project.baseline_budget else None
+        )
+
+        # Schedule variance (days)
+        if project.baseline_end_date:
+            ctx['schedule_variance'] = (project.planned_end_date - project.baseline_end_date).days
+        else:
+            ctx['schedule_variance'] = 0
+
+        # Days remaining
+        ctx['days_remaining'] = (project.planned_end_date - timezone.now().date()).days
+
+        # Expense summaries
+        expenses = project.expenses.all()
+        ctx['expense_total'] = expenses.aggregate(t=Sum('amount'))['t'] or 0
+        ctx['expense_confirmed'] = expenses.filter(status='Confirmed').aggregate(t=Sum('amount'))['t'] or 0
+        ctx['expense_pending'] = expenses.filter(status='Submitted').aggregate(t=Sum('amount'))['t'] or 0
+
+        return ctx
 
 class ProjectDeleteView(LoginRequiredMixin, SafeDeleteView):
     model = Project

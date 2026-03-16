@@ -1,0 +1,433 @@
+{% extends 'layouts/base.html' %}
+{% load crispy_forms_tags %}
+{% load role_permissions %}
+{% load currency_tags %}
+
+{% block title %}View Expense{% endblock title %}
+
+{% block navigation %}
+<div class="nk-block-head-content">
+    <h3 class="nk-block-title page-title">
+      Expense Details
+      {% if expense.status == 'Draft' %}
+        <span class="badge bg-secondary">{{expense.status}}</span>
+      {% elif expense.status == 'Submitted' %}
+        <span class="badge bg-info">{{expense.status}}</span>
+      {% elif expense.status == 'Confirmed' %}
+        <span class="badge bg-success">{{expense.status}}</span>
+      {% elif expense.status == 'Rejected' %}
+        <span class="badge bg-danger">{{expense.status}}</span>
+      {% elif expense.status == 'Cancelled' %}
+        <span class="badge bg-warning">{{expense.status}}</span>
+      {% else %}
+        <span class="badge bg-dark">{{expense.status}}</span>
+      {% endif %}
+    </h3>
+    <div class="nk-block-des text-soft">
+      <p>{{expense.category.name}} - {{expense.expense_date|date:"d M Y"}}</p>
+    </div> 
+  </div>
+  <div class="nk-block-head-content">
+    <div class="toggle-wrap nk-block-tools-toggle">
+      <a href="#" class="btn btn-icon btn-trigger toggle-expand me-n1" data-target="pageMenu">
+        <em class="icon ni ni-more-v"></em>
+    </a>
+      <div class="toggle-expand-content" data-content="pageMenu">
+        <ul class="nk-block-tools g-3">
+          {% if expense.is_editable and request.user|role_has_perm_in:"write_customer_relationship_module" %}
+          <li class="nk-block-tools-opt">
+            <a href="{% url "expense-update" expense.uid %}" class="btn btn-warning">
+              <em class="icon ni ni-edit"></em>
+                <span>Edit</span>
+            </a>
+          </li>
+          {% endif %}
+          
+          <li class="nk-block-tools-opt">
+            <a href="#" onclick="window.print(); return false;" class="btn btn-light">
+              <em class="icon ni ni-printer"></em>
+              <span>Print</span>
+            </a>
+          </li>
+          
+          <li class="nk-block-tools-opt">
+            <a href="{{ expense.object_absolute_url }}" class="btn btn-primary">
+                <em class="icon ni ni-curve-down-left"></em>
+                <span>Back</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block content %}
+<div class="row g-gs">
+    <!-- Amount Card -->
+    <div class="col-xxl-3 col-md-6">
+        <div class="card card-bordered h-100" style="border-left: 4px solid #6576ff;">
+            <div class="card-inner">
+                <div class="card-title-group align-start mb-2">
+                    <div class="card-title">
+                        <h6 class="title text-primary">Expense Amount</h6>
+                    </div>
+                    <div class="card-tools">
+                        <em class="icon ni ni-coins" style="font-size: 2rem; color: #6576ff; opacity: 0.3;"></em>
+                    </div>
+                </div>
+                <div class="align-end flex-sm-wrap g-4">
+                    <div class="nk-sale-data">
+                        <span class="amount h3 text-primary">{{expense.currency.symbol}} {{expense.amount|floatformat:2}}</span>
+                        <span class="sub-title d-block mt-1">{{expense.currency.code}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Card -->
+    <div class="col-xxl-3 col-md-6">
+        <div class="card card-bordered h-100" style="border-left: 4px solid #9d72ff;">
+            <div class="card-inner">
+                <div class="card-title-group align-start mb-2">
+                    <div class="card-title">
+                        <h6 class="title" style="color: #9d72ff;">Category</h6>
+                    </div>
+                    <div class="card-tools">
+                        <em class="icon ni ni-tag" style="font-size: 2rem; color: #9d72ff; opacity: 0.3;"></em>
+                    </div>
+                </div>
+                <div class="align-end flex-sm-wrap g-4">
+                    <div class="nk-sale-data">
+                        <span class="amount h5" style="color: #9d72ff;">{{expense.category.name}}</span>
+                        <span class="sub-title d-block mt-1">Expense Category</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Card -->
+    <div class="col-xxl-3 col-md-6">
+        <div class="card card-bordered h-100" style="border-left: 4px solid #1ee0ac;">
+            <div class="card-inner">
+                <div class="card-title-group align-start mb-2">
+                    <div class="card-title">
+                        <h6 class="title" style="color: #1ee0ac;">Expense Date</h6>
+                    </div>
+                    <div class="card-tools">
+                        <em class="icon ni ni-calendar" style="font-size: 2rem; color: #1ee0ac; opacity: 0.3;"></em>
+                    </div>
+                </div>
+                <div class="align-end flex-sm-wrap g-4">
+                    <div class="nk-sale-data">
+                        <span class="amount h5" style="color: #1ee0ac;">{{expense.expense_date|date:"d M Y"}}</span>
+                        <span class="sub-title d-block mt-1">Transaction Date</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Card -->
+    <div class="col-xxl-3 col-md-6">
+        <div class="card card-bordered h-100" style="border-left: 4px solid #f4bd0e;">
+            <div class="card-inner">
+                <div class="card-title-group align-start mb-2">
+                    <div class="card-title">
+                        <h6 class="title" style="color: #f4bd0e;">Status</h6>
+                    </div>
+                    <div class="card-tools">
+                        <em class="icon ni ni-check-circle" style="font-size: 2rem; color: #f4bd0e; opacity: 0.3;"></em>
+                    </div>
+                </div>
+                <div class="align-end flex-sm-wrap g-4">
+                    <div class="nk-sale-data">
+                        {% if expense.status == 'Draft' %}
+                            <span class="badge badge-dim bg-secondary" style="font-size: 0.9rem; padding: 0.5rem 1rem;">{{expense.status}}</span>
+                        {% elif expense.status == 'Submitted' %}
+                            <span class="badge badge-dim bg-info" style="font-size: 0.9rem; padding: 0.5rem 1rem;">{{expense.status}}</span>
+                        {% elif expense.status == 'Confirmed' %}
+                            <span class="badge badge-dim bg-success" style="font-size: 0.9rem; padding: 0.5rem 1rem;">{{expense.status}}</span>
+                        {% elif expense.status == 'Rejected' %}
+                            <span class="badge badge-dim bg-danger" style="font-size: 0.9rem; padding: 0.5rem 1rem;">{{expense.status}}</span>
+                        {% elif expense.status == 'Cancelled' %}
+                            <span class="badge badge-dim bg-warning" style="font-size: 0.9rem; padding: 0.5rem 1rem;">{{expense.status}}</span>
+                        {% else %}
+                            <span class="badge badge-dim bg-dark" style="font-size: 0.9rem; padding: 0.5rem 1rem;">{{expense.status}}</span>
+                        {% endif %}
+                        <span class="sub-title d-block mt-2">Current Status</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-gs mt-3">
+    <!-- Expense Details Card -->
+    <div class="col-lg-8">
+        <div class="card card-bordered">
+            <div class="card-inner">
+                <div class="card-title-group pb-3 border-bottom">
+                    <div class="card-title">
+                        <h6 class="title">
+                            <em class="icon ni ni-file-docs me-1"></em>
+                            Expense Information
+                        </h6>
+                    </div>
+                </div>
+                
+                <div class="row g-3 mt-1">
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded">
+                            <span class="sub-text d-block mb-1">Category</span>
+                            <span class="lead-text">{{expense.category.name}}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded">
+                            <span class="sub-text d-block mb-1">Expense Date</span>
+                            <span class="lead-text">{{expense.expense_date|date:"d M Y"}}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-lighter rounded" style="background-color: #f5f6fa;">
+                            <span class="sub-text d-block mb-1">Currency</span>
+                            <span class="lead-text">{{expense.currency.name}} ({{expense.currency.symbol}})</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-lighter rounded" style="background-color: #f5f6fa;">
+                            <span class="sub-text d-block mb-1">Amount</span>
+                            <span class="lead-text text-primary fw-bold">{{expense.currency.symbol}} {{expense.amount|floatformat:2}}</span>
+                        </div>
+                    </div>
+
+                    {% if expense.rate_at_expense_date %}
+                    <div class="col-12">
+                        <div class="p-3 rounded" style="background-color: #e5f3ff; border-left: 3px solid #6576ff;">
+                            <span class="sub-text d-block mb-1">Exchange Rate</span>
+                            <span class="lead-text">
+                                1 {{expense.rate_at_expense_date.from_currency.code}} = {{expense.rate_at_expense_date.rate}} {{expense.rate_at_expense_date.to_currency.code}}
+                            </span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="col-12">
+                        <div class="p-3 rounded" style="background-color: {% if expense.requires_approval %}#fff5e6{% else %}#e8f5e9{% endif %}; border-left: 3px solid {% if expense.requires_approval %}#f4bd0e{% else %}#1ee0ac{% endif %};">
+                            <span class="sub-text d-block mb-1">Requires Approval</span>
+                            {% if expense.requires_approval %}
+                                <span class="badge bg-warning">Yes - Approval Required</span>
+                            {% else %}
+                                <span class="badge bg-success">No - Direct Processing</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if expense.description %}
+                    <div class="col-12">
+                        <div class="p-3 bg-light rounded">
+                            <span class="sub-text d-block mb-2">Description</span>
+                            <p class="mb-0">{{expense.description}}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if expense.proof %}
+                    <div class="col-12">
+                        <div class="p-3 rounded" style="background-color: #f0f4ff; border-left: 3px solid #9d72ff;">
+                            <span class="sub-text d-block mb-2">Proof of Expense</span>
+                            <a href="{{expense.proof.url}}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <em class="icon ni ni-file-docs"></em>
+                                <span>View Receipt/Proof</span>
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if expense.content_object %}
+        <!-- Linked Object Card -->
+        <div class="card card-bordered mt-3">
+            <div class="card-inner">
+                <div class="card-title-group pb-3 border-bottom">
+                    <div class="card-title">
+                        <h6 class="title">
+                            <em class="icon ni ni-link me-1"></em>
+                            Related Record
+                        </h6>
+                    </div>
+                </div>
+                
+                <div class="mt-3 p-3 rounded" style="background-color: #f8f9fa; border-left: 3px solid #526484;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="sub-text d-block mb-1">Linked To</span>
+                            <span class="lead-text">{{expense.content_object}}</span>
+                        </div>
+                        {% if expense.content_object.expense_absolute_url %}
+                        <a href="{{expense.content_object.expense_absolute_url}}" class="btn btn-sm btn-outline-primary">
+                            <em class="icon ni ni-external"></em>
+                            <span>View</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Recorded By Card -->
+        <div class="card card-bordered">
+            <div class="card-inner">
+                <div class="card-title-group pb-3 border-bottom">
+                    <div class="card-title">
+                        <h6 class="title">
+                            <em class="icon ni ni-user me-1"></em>
+                            Recorded By
+                        </h6>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <div class="user-card">
+                        <div class="user-avatar bg-primary">
+                            <span>{{expense.recorded_by.get_full_name|slice:":1"|upper|default:expense.recorded_by.username|slice:":1"|upper}}</span>
+                        </div>
+                        <div class="user-info">
+                            <span class="lead-text">{{expense.recorded_by.get_full_name|default:expense.recorded_by.username}}</span>
+                            <span class="sub-text">{{expense.recorded_by.email}}</span>
+                        </div>
+                    </div>
+                    
+                    <ul class="list-plain mt-3">
+                        <li class="mb-2">
+                            <em class="icon ni ni-calendar text-primary"></em>
+                            <span class="ms-2">{{expense.created|date:"d M Y H:i"}}</span>
+                        </li>
+                        {% if expense.recorded_by.phone %}
+                        <li class="mb-2">
+                            <em class="icon ni ni-call text-success"></em>
+                            <span class="ms-2">{{expense.recorded_by.phone}}</span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audit Trail Card -->
+        <div class="card card-bordered mt-3">
+            <div class="card-inner">
+                <div class="card-title-group pb-3 border-bottom">
+                    <div class="card-title">
+                        <h6 class="title">
+                            <em class="icon ni ni-clock me-1"></em>
+                            Audit Trail
+                        </h6>
+                    </div>
+                </div>
+                
+                <ul class="list-group list-group-flush mt-3">
+                    <li class="list-group-item px-0">
+                        <div class="d-flex justify-content-between">
+                            <span class="sub-text">Created</span>
+                            <span class="fw-bold">{{expense.created|date:"d M Y H:i"}}</span>
+                        </div>
+                    </li>
+                    <li class="list-group-item px-0">
+                        <div class="d-flex justify-content-between">
+                            <span class="sub-text">Last Updated</span>
+                            <span class="fw-bold">{{expense.updated|date:"d M Y H:i"}}</span>
+                        </div>
+                    </li>
+                    <li class="list-group-item px-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="sub-text">Status</span>
+                            {% if expense.status == 'Confirmed' %}
+                                <span class="badge bg-success">{{expense.status}}</span>
+                            {% elif expense.status == 'Draft' %}
+                                <span class="badge bg-secondary">{{expense.status}}</span>
+                            {% elif expense.status == 'Submitted' %}
+                                <span class="badge bg-info">{{expense.status}}</span>
+                            {% elif expense.status == 'Rejected' %}
+                                <span class="badge bg-danger">{{expense.status}}</span>
+                            {% else %}
+                                <span class="badge bg-warning">{{expense.status}}</span>
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% if expense.status_reason %}
+                    <li class="list-group-item px-0">
+                        <div>
+                            <span class="sub-text d-block mb-1">Status Reason</span>
+                            <span>{{expense.status_reason}}</span>
+                        </div>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Quick Actions Card -->
+        {% if expense.is_editable and request.user|role_has_perm_in:"write_customer_relationship_module" %}
+        <div class="card card-bordered mt-3" style="border-left: 4px solid #f4bd0e;">
+            <div class="card-inner">
+                <div class="card-title-group pb-3 border-bottom">
+                    <div class="card-title">
+                        <h6 class="title">
+                            <em class="icon ni ni-spark me-1"></em>
+                            Quick Actions
+                        </h6>
+                    </div>
+                </div>
+                
+                <div class="mt-3 d-grid gap-2">
+                    <a href="{% url "expense-update" expense.uid %}" class="btn btn-outline-warning">
+                        <em class="icon ni ni-edit"></em>
+                        <span>Edit Expense</span>
+                    </a>
+                    
+                    <a href="#" onclick="window.print(); return false;" class="btn btn-outline-primary">
+                        <em class="icon ni ni-printer"></em>
+                        <span>Print Details</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    @media print {
+        .nk-header, 
+        .nk-sidebar, 
+        .nk-footer,
+        .nk-block-head-content .toggle-wrap,
+        .no-print {
+            display: none !important;
+        }
+        
+        .card {
+            border: 1px solid #ddd !important;
+            page-break-inside: avoid;
+        }
+        
+        .badge {
+            border: 1px solid currentColor;
+        }
+    }
+</style>
+{% endblock %}
