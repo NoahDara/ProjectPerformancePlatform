@@ -1,9 +1,14 @@
 from helpers.forms import CustomBaseForm
-from .models import Task
+from .models import Task, TaskUpdate
 
 class TaskForm(CustomBaseForm):
     class Meta:
         model = Task
         fields = "__all__"
-        exclude = ['project', 'baseline_end_date', 'baseline_budget', 'baseline_locked', 'actual_end_date']
+        exclude = ['project', ]
         
+class TaskUpdateForm(CustomBaseForm):
+    class Meta:
+        model = TaskUpdate
+        fields = "__all__"     
+        exclude = ['task', 'submitted_by']

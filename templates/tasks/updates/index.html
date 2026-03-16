@@ -1,0 +1,24 @@
+<div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+    <table class="table table-bordered table-striped" id="sageDataTable">
+        <thead class="table-light" style="position: sticky; top: 0; z-index: 10;">
+            <tr>
+                <th>Submitted By</th>
+                <th>Date</th>
+                <th>Value Achieved</th>
+                <th>Notes</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for progress in task.updates.all %}
+            <tr>
+                <td>{{ progress.submitted_by }}</td>
+                <td>{{ progress.submitted_by }}</td>
+                <td>{{ progress.submitted_by }}</td>
+                <td>{{ progress.submitted_by }}</td>
+                <td>{{ progress.submitted_by }}</td>
+            </tr>      
+            {% endfor %}     
+        </tbody>
+    </table>
+</div>

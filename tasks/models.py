@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from helpers.models import BaseModel
 from employees.models import Employee
 from projects.models import ProjectDiscipline
-
+from django.utils import timezone
 
 class Task(BaseModel):
     MEASUREMENT_CHOICES = [
@@ -128,15 +128,6 @@ class Task(BaseModel):
 
         return 0
 
-    @property
-    def total_actual_cost(self):
-        """Sum of all actual costs logged across all updates."""
-        return self.updates.filter(
-            is_active=True
-        ).aggregate(
-            total=models.Sum('actual_cost')
-        )['total'] or 0
-
 
 class TaskUpdate(BaseModel):
     task = models.ForeignKey(
@@ -150,7 +141,7 @@ class TaskUpdate(BaseModel):
         null=True,
         related_name="submitted_updates"
     )
-    date = models.DateField()
+    date = models.DateField(default=timezone.now)
     value_achieved = models.FloatField(
         help_text=(
             "For units/linear/hours: quantity achieved THIS session (additive). "
@@ -158,7 +149,6 @@ class TaskUpdate(BaseModel):
             "For lump_sum: 1 = done, 0 = not done."
         )
     )
-    actual_cost = models.FloatField(help_text="Actual cost incurred during this update session.")
     notes = models.TextField(blank=True, null=True)
 
     class Meta(BaseModel.Meta):
