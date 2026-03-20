@@ -5,12 +5,12 @@
 {% block page_sub_title %}Manage system users and their access{% endblock %}
 
 {% block actions %}
-  <li class="nk-block-tools-opt">
+  {% comment %} <li class="nk-block-tools-opt">
     <a href="{% url "register-user" %}" class="btn btn-primary">
       <em class="icon ni ni-plus-round"></em>
       <span>Create User</span>
     </a>
-  </li>
+  </li> {% endcomment %}
 {% endblock %}
 
 {% block content %}
@@ -46,7 +46,7 @@
           <td>{{ obj.date_joined|date:"Y-m-d" }}</td>
           <td>
             {% if not obj.is_admin %}
-              <a href="{% url 'update-user' obj.pk %}" class="btn btn-dim btn-outline-primary btn-sm">Update</a>
+              <a href="{% url 'user-update' obj.pk %}" class="btn btn-dim btn-outline-primary btn-sm">Update</a>
               <a href="#" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ obj.pk }}" class="btn btn-dim btn-outline-danger btn-sm">Delete</a>
               {% if obj.is_active %}
                 <a href="{% url 'deactivate-user' obj.pk %}" class="btn btn-dim btn-outline-info btn-sm">Deactivate</a>
