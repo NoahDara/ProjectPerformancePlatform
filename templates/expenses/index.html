@@ -39,12 +39,7 @@
         <div class="card card-bordered">
         <div class="card-inner">
             <div class="card-title-group mb-3">
-            <h6 class="card-title">Expense Entries</h6>
-            <div class="card-tools">
-                <a href="#" class="btn btn-sm btn-primary">
-                <em class="icon ni ni-plus"></em> Log Expense
-                </a>
-            </div>
+               <h6 class="card-title">Expense Entries</h6>
             </div>
             {% if project.expenses.exists %}
             <div class="table-responsive">
@@ -87,7 +82,7 @@
                         <em class="icon ni ni-edit"></em>
                     </a>
                     {% else %}
-                    <a href="#" class="btn btn-icon btn-xs btn-light">
+                    <a href="{% url "expense-update" expense.pk %}" class="btn btn-icon btn-xs btn-light">
                         <em class="icon ni ni-eye"></em>
                     </a>
                     {% endif %}
@@ -101,7 +96,7 @@
             <div class="text-center py-5 text-muted">
             <em class="icon ni ni-coins fs-1 d-block mb-2"></em>
             <p>No expenses logged for this project.</p>
-            <a href="#" class="btn btn-primary mt-2">Log First Expense</a>
+            <a href="{% url "expense-create" project.pk %}" class="btn btn-primary mt-2">Log First Expense</a>
             </div>
             {% endif %}
         </div>

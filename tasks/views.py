@@ -12,10 +12,13 @@ from django.contrib import messages
 
 # Create your views here.
 class TaskCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
-    model = Project 
+    model = Task 
     template_name = "tasks/create.html"
     form_class = TaskForm
     success_message = "New task has been added to the project"
+    
+    def get_object(self):
+        return get_object_or_404(Project, pk=self.kwargs["pk"])
 
     def form_valid(self, form):
         project = self.get_object()

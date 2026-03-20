@@ -28,7 +28,7 @@
 
 {% block actions %}
   <li>
-    <a href="#" class="btn btn-white btn-dim btn-outline-primary">
+    <a href="{% url 'project-pdf' pk=project.pk %}" class="btn btn-white btn-dim btn-outline-primary">
       <em class="icon ni ni-download-cloud"></em>
       <span>Export</span>
     </a>
@@ -71,7 +71,7 @@
             </a>
           </li>
           <li>
-            <a href="#">
+            <a href="{% url "expense-create" project.pk %}">
               <em class="icon ni ni-coin-alt"></em>
               <span>Log Expense</span>
             </a>

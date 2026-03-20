@@ -19,7 +19,7 @@ urlpatterns = [
     path('generate-expense-categories/', GenerateExpenseCategoriesView.as_view(), name='generate-expense-categories'),
     
     path("", ExpenseListView.as_view(), name="expense-index"),
-    path("create", ExpenseCreateView.as_view(), name="expense-create"),
+    path("create/project/<int:pk>", ExpenseCreateView.as_view(), name="expense-create"),
     path("<int:pk>/update", ExpenseUpdateView.as_view(), name="expense-update"),
     path("<int:pk>/detail", ExpenseDetailView.as_view(), name="expense-details"),
     path("<int:pk>/delete", ExpenseDeleteView.as_view(), name="expense-delete"),

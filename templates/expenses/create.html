@@ -3,91 +3,42 @@
 
 {% block title %}Create Expense{% endblock title %}
 
-{% block navigation %}
-<div class="nk-block-head-content">
-    <h3 class="nk-block-title page-title">
-      Create New Expense
-      {% if content_object %}
-        <small class="text-muted">for {{ content_object }}</small>
-      {% endif %}
-    </h3>
-  </div>
-  <div class="nk-block-head-content">
-    <div class="toggle-wrap nk-block-tools-toggle">
-      <a href="#" class="btn btn-icon btn-trigger toggle-expand me-n1" data-target="pageMenu">
-        <em class="icon ni ni-more-v"></em>
-    </a>
-      <div class="toggle-expand-content" data-content="pageMenu">
-        <ul class="nk-block-tools g-3">
-          <li class="nk-block-tools-opt">
-            {% if content_object and content_object.expense_absolute_url %}
-              <a href="{{ content_object.expense_absolute_url }}" class="btn btn-primary">
-                <em class="icon ni ni-curve-down-left"></em>
-                <span>Back</span>
-              </a>
-            {% else %}
-              <a href="{% url "expense-index" %}" class="btn btn-primary">
-                <em class="icon ni ni-curve-down-left"></em>
-                <span>Back</span>
-              </a>
-            {% endif %}
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
+{% block page_title %}Create New Expense{% endblock %}
+{% block page_sub_title %}{{ project.name }}{% endblock %}
+
+{% block actions %}
+<li class="nk-block-tools-opt">
+  <a href="{% url 'project-details' pk=project.pk %}" class="btn btn-primary">
+    <em class="icon ni ni-curve-down-left"></em>
+    <span>Back to Project</span>
+  </a>
+</li>
 {% endblock %}
 
 {% block content %}
-<div class="card card-bordered card-preview">
-  <div class="card-inner">
-    <div class="preview-block">
-      <span class="preview-title-lg overline-title">Expense Form</span>
-      <form method="post" enctype="multipart/form-data" id="expenseForm">
+<div class="col-12">
+  <div class="card card-bordered">
+    <div class="card-inner">
+      <span class="preview-title-lg overline-title mb-4 d-block">Expense Details</span>
+      <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
         {{ form.get_error_html|safe }}
-        
+
         <div class="row gy-4">
           {{ form.render_form|safe }}
         </div>
-        
-        <div class="form-group mt-3">
+
+        <div class="form-group mt-4">
           <button type="submit" name="submit_action" value="draft" class="btn btn-secondary">
             <em class="icon ni ni-save"></em> Save as Draft
           </button>
-          <button type="submit" name="submit_action" value="confirmed" class="btn btn-primary" id="confirmButton">
-            <em class="icon ni ni-check-circle"></em> Save as Confirmed
+          <button type="submit" name="submit_action" value="confirmed" class="btn btn-primary">
+            <em class="icon ni ni-check-circle"></em> Confirm Expense
           </button>
-          {% comment %} <button type="submit" name="submit_action" value="submitted" class="btn btn-info" id="submitButton" style="display:none;">
-            <em class="icon ni ni-upload"></em> Submit for Approval
-          </button> {% endcomment %}
         </div>
-      </form>   
+      </form>
     </div>
   </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const requiresApprovalCheckbox = document.querySelector('input[name="requires_approval"]');
-    const confirmButton = document.getElementById('confirmButton');
-    const submitButton = document.getElementById('submitButton');
-    
-    function toggleButtons() {
-        if (requiresApprovalCheckbox && requiresApprovalCheckbox.checked) {
-            confirmButton.style.display = 'none';
-            submitButton.style.display = 'inline-block';
-        } else {
-            confirmButton.style.display = 'inline-block';
-            submitButton.style.display = 'none';
-        }
-    }
-    
-    if (requiresApprovalCheckbox) {
-        requiresApprovalCheckbox.addEventListener('change', toggleButtons);
-        toggleButtons(); // Initial state
-    }
-});
-</script>
 {% endblock %}

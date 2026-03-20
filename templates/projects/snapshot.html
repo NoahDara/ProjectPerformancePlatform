@@ -2,7 +2,6 @@
     <div class="row g-gs mt-1">
 
     {% if project.snapshot %}
-    {% with snap=project.snapshot %}
 
     {# Performance index summary cards #}
     <div class="col-sm-6 col-lg-3">
@@ -11,14 +10,14 @@
             <em class="icon ni ni-speedometer fs-2 text-primary mb-2 d-block"></em>
             <p class="text-muted fs-7 mb-1">Schedule Performance Index</p>
             <p class="fs-2 fw-bold mb-0
-            {% if snap.final_spi >= 1 %}text-success
-            {% elif snap.final_spi >= 0.8 %}text-warning
+            {% if project.snapshot.final_spi >= 1 %}text-success
+            {% elif project.snapshot.final_spi >= 0.8 %}text-warning
             {% else %}text-danger{% endif %}">
-            {{ snap.final_spi }}
+            {{ project.snapshot.final_spi }}
             </p>
             <p class="fs-7 text-muted mt-1">
-            {% if snap.final_spi >= 1 %}Ahead of / on schedule
-            {% elif snap.final_spi >= 0.8 %}Minor delay
+            {% if project.snapshot.final_spi >= 1 %}Ahead of / on schedule
+            {% elif project.snapshot.final_spi >= 0.8 %}Minor delay
             {% else %}Significant delay{% endif %}
             </p>
         </div>
@@ -31,14 +30,14 @@
             <em class="icon ni ni-coins fs-2 text-warning mb-2 d-block"></em>
             <p class="text-muted fs-7 mb-1">Cost Performance Index</p>
             <p class="fs-2 fw-bold mb-0
-            {% if snap.final_cpi >= 1 %}text-success
-            {% elif snap.final_cpi >= 0.8 %}text-warning
+            {% if project.snapshot.final_cpi >= 1 %}text-success
+            {% elif project.snapshot.final_cpi >= 0.8 %}text-warning
             {% else %}text-danger{% endif %}">
-            {{ snap.final_cpi }}
+            {{ project.snapshot.final_cpi }}
             </p>
             <p class="fs-7 text-muted mt-1">
-            {% if snap.final_cpi >= 1 %}Under / on budget
-            {% elif snap.final_cpi >= 0.8 %}Minor overrun
+            {% if project.snapshot.final_cpi >= 1 %}Under / on budget
+            {% elif project.snapshot.final_cpi >= 0.8 %}Minor overrun
             {% else %}Significant overrun{% endif %}
             </p>
         </div>
@@ -50,7 +49,7 @@
         <div class="card-inner">
             <em class="icon ni ni-calendar-check fs-2 text-info mb-2 d-block"></em>
             <p class="text-muted fs-7 mb-1">Actual Duration</p>
-            <p class="fs-2 fw-bold mb-0 text-dark">{{ snap.actual_duration }}</p>
+            <p class="fs-2 fw-bold mb-0 text-dark">{{ project.snapshot.actual_duration }}</p>
             <p class="fs-7 text-muted mt-1">days</p>
         </div>
         </div>
@@ -61,7 +60,7 @@
         <div class="card-inner">
             <em class="icon ni ni-users fs-2 text-secondary mb-2 d-block"></em>
             <p class="text-muted fs-7 mb-1">Team Size</p>
-            <p class="fs-2 fw-bold mb-0 text-dark">{{ snap.team_size }}</p>
+            <p class="fs-2 fw-bold mb-0 text-dark">{{ project.snapshot.team_size }}</p>
             <p class="fs-7 text-muted mt-1">members</p>
         </div>
         </div>
@@ -75,34 +74,34 @@
             <ul class="data-list is-compact">
             <li class="data-item">
                 <div class="data-col"><span class="data-label text-muted">Budget at Completion</span></div>
-                <div class="data-col"><span class="data-value fw-medium">${{ snap.budget_at_completion|floatformat:0 }}</span></div>
+                <div class="data-col"><span class="data-value fw-medium">${{ project.snapshot.budget_at_completion|floatformat:0 }}</span></div>
             </li>
             <li class="data-item">
                 <div class="data-col"><span class="data-label text-muted">Final Actual Cost</span></div>
                 <div class="data-col">
-                <span class="data-value fw-medium {% if snap.final_cost > snap.budget_at_completion %}text-danger{% else %}text-success{% endif %}">
-                    ${{ snap.final_cost|floatformat:0 }}
+                <span class="data-value fw-medium {% if project.snapshot.final_cost > project.snapshot.budget_at_completion %}text-danger{% else %}text-success{% endif %}">
+                    ${{ project.snapshot.final_cost|floatformat:0 }}
                 </span>
                 </div>
             </li>
             <li class="data-item">
                 <div class="data-col"><span class="data-label text-muted">Cost Outcome</span></div>
                 <div class="data-col">
-                <span class="data-value fw-medium {% if snap.final_cost > snap.budget_at_completion %}text-danger{% else %}text-success{% endif %}">
-                    {% if snap.final_cost > snap.budget_at_completion %}Over budget{% else %}Under / on budget{% endif %}
+                <span class="data-value fw-medium {% if project.snapshot.final_cost > project.snapshot.budget_at_completion %}text-danger{% else %}text-success{% endif %}">
+                    {% if project.snapshot.final_cost > project.snapshot.budget_at_completion %}Over budget{% else %}Under / on budget{% endif %}
                 </span>
                 </div>
             </li>
             <li class="data-item">
                 <div class="data-col"><span class="data-label text-muted">Final CPI</span></div>
-                <div class="data-col"><span class="data-value fw-medium">{{ snap.final_cpi }}</span></div>
+                <div class="data-col"><span class="data-value fw-medium">{{ project.snapshot.final_cpi }}</span></div>
             </li>
             </ul>
         </div>
         </div>
     </div>
 
-    {# Project profile #}
+
     <div class="col-lg-6">
         <div class="card card-bordered h-100">
         <div class="card-inner">
@@ -112,34 +111,31 @@
                 <div class="data-col"><span class="data-label text-muted">Discipline Mix</span></div>
                 <div class="data-col">
                 <div class="d-flex gap-1 flex-wrap">
-                    {% for code in snap %}
-                    <span class="badge bg-outline-primary text-primary border border-primary fs-7">{{ code|upper }}</span>
-                    {% endfor %}
+                    <span class="badge bg-outline-primary text-primary border border-primary fs-7">{{ project.snapshot.discipline_mix|upper }}</span>
                 </div>
                 </div>
             </li>
             <li class="data-item">
                 <div class="data-col"><span class="data-label text-muted">Team Size</span></div>
-                <div class="data-col"><span class="data-value">{{ snap.team_size }} members</span></div>
+                <div class="data-col"><span class="data-value">{{ project.snapshot.team_size }} members</span></div>
             </li>
             <li class="data-item">
                 <div class="data-col"><span class="data-label text-muted">Actual Duration</span></div>
-                <div class="data-col"><span class="data-value">{{ snap.actual_duration }} days</span></div>
+                <div class="data-col"><span class="data-value">{{ project.snapshot.actual_duration }} days</span></div>
             </li>
             <li class="data-item">
                 <div class="data-col"><span class="data-label text-muted">Final SPI</span></div>
-                <div class="data-col"><span class="data-value">{{ snap.final_spi }}</span></div>
+                <div class="data-col"><span class="data-value">{{ project.snapshot.final_spi }}</span></div>
             </li>
             <li class="data-item">
                 <div class="data-col"><span class="data-label text-muted">Snapshot Recorded</span></div>
-                <div class="data-col"><span class="data-value text-muted">{{ snap.created_at|date:"d M Y" }}</span></div>
+                <div class="data-col"><span class="data-value text-muted">{{ project.snapshot.created|date:"d M Y" }}</span></div>
             </li>
             </ul>
         </div>
         </div>
     </div>
 
-    {% endwith %}
     {% else %}
 
     {# No snapshot yet #}

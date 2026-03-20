@@ -1,0 +1,47 @@
+{% extends 'layouts/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Update Task{% endblock title %}
+
+{% block page_title %}Update New Task{% endblock %}
+
+{% block page_sub_title %}
+ <strong>{{ task }}</strong>
+{% endblock %}
+
+{% block actions %}
+  <li>
+    <a href="{% url 'project-details' task.discipline.project.pk %}" class="btn btn-white btn-dim btn-outline-light">
+      <em class="icon ni ni-curve-down-left"></em>
+      <span>Back to Project</span>
+    </a>
+  </li>
+{% endblock %}
+
+{% block content %}
+<div class="col-12">
+  <div class="card card-bordered">
+    <div class="card-inner">
+      <div class="card-title-group mb-3">
+        <h6 class="card-title">Task Details</h6>
+      </div>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {{ form.get_error_html|safe }}
+
+        <div class="row gy-4">
+          {{ form.render_form|safe }}
+        </div>
+
+        <div class="form-group mt-4">
+          <button type="submit" class="btn btn-primary">
+            <em class="icon ni ni-check"></em>
+            <span>Update Task</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

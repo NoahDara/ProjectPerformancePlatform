@@ -1,603 +1,694 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
+{% load static %}
 
-{% block navigation %}
-<div class="content-header">
-    <div class="container-fluid">
-      <div class="row mb-2">
-        <div class="col-sm-6">
-          <h1 class="m-0">Dashboard</h1>
-        </div><!-- /.col -->
-        <div class="col-sm-6">
-          <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item active">Dashboard v1</li>
-          </ol>
-        </div><!-- /.col -->
-      </div><!-- /.row -->
-    </div><!-- /.container-fluid -->
-</div>
+{% block title %}Dashboard{% endblock %}
+
+{% block page_title %}Command Centre{% endblock %}
+{% block page_sub_title %}Live project intelligence — {{ today|date:"l, d F Y" }}{% endblock %}
+
+{% block actions %}
+<li>
+  <a href="{% url 'project-index' %}" class="btn btn-white btn-dim btn-outline-primary">
+    <em class="icon ni ni-grid-alt"></em>
+    <span>All Projects</span>
+  </a>
+</li>
+<li class="nk-block-tools-opt">
+  <a href="{% url 'project-create' %}" class="btn btn-primary">
+    <em class="icon ni ni-plus"></em>
+    <span>New Project</span>
+  </a>
+</li>
 {% endblock %}
 
 {% block content %}
-<section class="content">
-    <div class="container-fluid">
-      <!-- Small boxes (Stat box) -->
-      <div class="row">
-        <div class="col-lg-3 col-6">
-          <!-- small box -->
-          <div class="small-box bg-info">
-            <div class="inner">
-              <h3>150</h3>
 
-              <p>New Orders</p>
-            </div>
-            <div class="icon">
-              <i class="ion ion-bag"></i>
-            </div>
-            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-          </div>
-        </div>
-        <!-- ./col -->
-        <div class="col-lg-3 col-6">
-          <!-- small box -->
-          <div class="small-box bg-success">
-            <div class="inner">
-              <h3>53<sup style="font-size: 20px">%</sup></h3>
+<style>
+  /* ── Design Tokens ─────────────────────────────────────── */
+  :root {
+    --ink:        #0d1117;
+    --surface:    #ffffff;
+    --muted:      #f4f5f7;
+    --border:     #e5e9f0;
+    --text-base:  #1a2332;
+    --text-soft:  #6b7c93;
+    --blue:       #1B4FD8;
+    --blue-lt:    #EEF2FF;
+    --teal:       #0891b2;
+    --teal-lt:    #ECFEFF;
+    --amber:      #d97706;
+    --amber-lt:   #FFFBEB;
+    --green:      #059669;
+    --green-lt:   #ECFDF5;
+    --red:        #dc2626;
+    --red-lt:     #FEF2F2;
+    --radius:     10px;
+    --shadow:     0 1px 3px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.04);
+    --shadow-md:  0 4px 16px rgba(0,0,0,.09);
+    --font-head:  'DM Sans', 'Segoe UI', sans-serif;
+    --font-mono:  'DM Mono', 'Courier New', monospace;
+  }
 
-              <p>Bounce Rate</p>
-            </div>
-            <div class="icon">
-              <i class="ion ion-stats-bars"></i>
-            </div>
-            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-          </div>
-        </div>
-        <!-- ./col -->
-        <div class="col-lg-3 col-6">
-          <!-- small box -->
-          <div class="small-box bg-warning">
-            <div class="inner">
-              <h3>44</h3>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 
-              <p>User Registrations</p>
-            </div>
-            <div class="icon">
-              <i class="ion ion-person-add"></i>
-            </div>
-            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-          </div>
-        </div>
-        <!-- ./col -->
-        <div class="col-lg-3 col-6">
-          <!-- small box -->
-          <div class="small-box bg-danger">
-            <div class="inner">
-              <h3>65</h3>
+  .dash-grid { display: grid; gap: 20px; }
 
-              <p>Unique Visitors</p>
-            </div>
-            <div class="icon">
-              <i class="ion ion-pie-graph"></i>
-            </div>
-            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-          </div>
-        </div>
-        <!-- ./col -->
+  .iq-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: box-shadow .2s ease, transform .2s ease;
+  }
+  .iq-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .iq-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 0;
+  }
+  .iq-card-title {
+    font-family: var(--font-head);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+  }
+  .iq-card-body { padding: 16px 20px 20px; }
+
+  .stat-card {
+    position: relative;
+    padding: 22px 22px 18px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: box-shadow .2s, transform .2s;
+  }
+  .stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .stat-card.blue::after  { background: var(--blue); }
+  .stat-card.teal::after  { background: var(--teal); }
+  .stat-card.green::after { background: var(--green); }
+  .stat-card.amber::after { background: var(--amber); }
+
+  .stat-icon {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+  .stat-icon.blue  { background: var(--blue-lt);  color: var(--blue); }
+  .stat-icon.teal  { background: var(--teal-lt);  color: var(--teal); }
+  .stat-icon.green { background: var(--green-lt); color: var(--green); }
+  .stat-icon.amber { background: var(--amber-lt); color: var(--amber); }
+
+  .stat-value {
+    font-family: var(--font-head);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-base);
+    line-height: 1;
+    letter-spacing: -.5px;
+  }
+  .stat-label { font-size: 12px; color: var(--text-soft); margin-top: 4px; font-weight: 500; }
+  .stat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+    margin-top: 10px;
+  }
+  .stat-badge.up   { background: var(--green-lt); color: var(--green); }
+  .stat-badge.down { background: var(--red-lt);   color: var(--red); }
+  .stat-badge.flat { background: var(--muted);     color: var(--text-soft); }
+
+  .iq-bar-track { height: 6px; background: var(--muted); border-radius: 99px; overflow: hidden; }
+  .iq-bar-fill  { height: 100%; border-radius: 99px; transition: width .6s cubic-bezier(.4,0,.2,1); }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: capitalize;
+  }
+  .status-pill::before { content: ''; width: 5px; height: 5px; border-radius: 50%; display: inline-block; }
+  .status-pill.planning      { background: #F0F4FF; color: var(--blue);  }
+  .status-pill.planning::before    { background: var(--blue); }
+  .status-pill.in_progress   { background: var(--teal-lt);  color: var(--teal);  }
+  .status-pill.in_progress::before { background: var(--teal); }
+  .status-pill.on_hold       { background: var(--amber-lt); color: var(--amber); }
+  .status-pill.on_hold::before     { background: var(--amber); }
+  .status-pill.completed     { background: var(--green-lt); color: var(--green); }
+  .status-pill.completed::before   { background: var(--green); }
+
+  .index-ring { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
+  .index-ring svg { transform: rotate(-90deg); }
+  .index-ring .ring-label {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .ring-label .val { font-family: var(--font-head); font-size: 16px; font-weight: 700; color: var(--text-base); line-height: 1; }
+  .ring-label .lbl { font-size: 9px; font-weight: 600; letter-spacing: .05em; color: var(--text-soft); text-transform: uppercase; margin-top: 1px; }
+
+  /* Active Projects — always full-width table columns */
+  .proj-row {
+    display: grid;
+    grid-template-columns: 1fr 110px 90px 80px 36px;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .proj-row:last-child { border-bottom: none; }
+  .proj-name { font-size: 13px; font-weight: 600; color: var(--text-base); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .proj-meta { font-size: 11px; color: var(--text-soft); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .donut-wrap { position: relative; width: 120px; height: 120px; flex-shrink: 0; }
+  .donut-wrap .donut-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .donut-label .big { font-size: 22px; font-weight: 700; color: var(--text-base); line-height: 1; }
+  .donut-label .sm  { font-size: 10px; color: var(--text-soft); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; display: inline-block; flex-shrink: 0; }
+
+  .feed-item { display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+  .feed-item:last-child { border-bottom: none; }
+  .feed-avatar {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--blue-lt); color: var(--blue);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+    font-family: var(--font-head);
+  }
+  .feed-text { font-size: 12.5px; color: var(--text-base); line-height: 1.45; }
+  .feed-text strong { font-weight: 600; }
+  .feed-time { font-size: 11px; color: var(--text-soft); margin-top: 2px; }
+
+  .exp-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .exp-row:last-child { border-bottom: none; }
+  .exp-cat {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--amber-lt); color: var(--amber);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .exp-amount { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--text-base); margin-left: auto; white-space: nowrap; }
+
+  .milestone-row { display: flex; align-items: flex-start; gap: 12px; padding-bottom: 16px; position: relative; }
+  .milestone-row:not(:last-child)::before {
+    content: ''; position: absolute; left: 11px; top: 24px;
+    width: 2px; bottom: 0; background: var(--border);
+  }
+  .milestone-dot {
+    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; z-index: 1;
+  }
+  .milestone-dot.done    { background: var(--green-lt); color: var(--green); }
+  .milestone-dot.active  { background: var(--blue-lt);  color: var(--blue); box-shadow: 0 0 0 4px #EEF2FF; }
+  .milestone-dot.pending { background: var(--muted);    color: var(--text-soft); }
+  .milestone-name  { font-size: 12.5px; font-weight: 600; color: var(--text-base); }
+  .milestone-dates { font-size: 11px; color: var(--text-soft); margin-top: 1px; }
+</style>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     ROW 1 — KPI stat cards
+     ═══════════════════════════════════════════════════════════ -->
+<div class="row g-4 mb-4">
+
+  <div class="col-6 col-lg-3">
+    <div class="stat-card blue">
+      <div class="stat-icon blue"><em class="icon ni ni-grid-alt-fill"></em></div>
+      <div class="stat-value">{{ active_projects_count|default:"12" }}</div>
+      <div class="stat-label">Active Projects</div>
+      <span class="stat-badge up"><em class="icon ni ni-arrow-up"></em> 2 this month</span>
+    </div>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <div class="stat-card teal">
+      <div class="stat-icon teal"><em class="icon ni ni-coin-alt-fill"></em></div>
+      <div class="stat-value">${{ total_budget_m|default:"4.2" }}M</div>
+      <div class="stat-label">Portfolio Budget</div>
+      <span class="stat-badge flat"><em class="icon ni ni-minus"></em> All projects</span>
+    </div>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <div class="stat-card green">
+      <div class="stat-icon green"><em class="icon ni ni-activity-round-fill"></em></div>
+      <div class="stat-value">{{ avg_spi|default:"0.94" }}</div>
+      <div class="stat-label">Avg Schedule Index</div>
+      <span class="stat-badge down"><em class="icon ni ni-arrow-down"></em> 0.03 vs last month</span>
+    </div>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <div class="stat-card amber">
+      <div class="stat-icon amber"><em class="icon ni ni-chart-up"></em></div>
+      <div class="stat-value">{{ avg_cpi|default:"1.02" }}</div>
+      <div class="stat-label">Avg Cost Index</div>
+      <span class="stat-badge up"><em class="icon ni ni-arrow-up"></em> 0.05 vs last month</span>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     ROW 2 — Active Projects (full width)
+     ═══════════════════════════════════════════════════════════ -->
+<div class="row g-4 mb-4">
+
+  <div class="col-12">
+    <div class="iq-card">
+      <div class="iq-card-head">
+        <span class="iq-card-title">Active Projects</span>
+        <a href="{% url 'project-index' %}" class="btn btn-xs btn-outline-light">
+          View all <em class="icon ni ni-chevron-right"></em>
+        </a>
       </div>
-      <!-- /.row -->
-      <!-- Main row -->
-      <div class="row">
-        <!-- Left col -->
-        <section class="col-lg-7 connectedSortable">
-          <!-- Custom tabs (Charts with tabs)-->
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">
-                <i class="fas fa-chart-pie mr-1"></i>
-                Sales
-              </h3>
-              <div class="card-tools">
-                <ul class="nav nav-pills ml-auto">
-                  <li class="nav-item">
-                    <a class="nav-link active" href="#revenue-chart" data-toggle="tab">Area</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#sales-chart" data-toggle="tab">Donut</a>
-                  </li>
-                </ul>
-              </div>
-            </div><!-- /.card-header -->
-            <div class="card-body">
-              <div class="tab-content p-0">
-                <!-- Morris chart - Sales -->
-                <div class="chart tab-pane active" id="revenue-chart"
-                     style="position: relative; height: 300px;">
-                    <canvas id="revenue-chart-canvas" height="300" style="height: 300px;"></canvas>
-                 </div>
-                <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;">
-                  <canvas id="sales-chart-canvas" height="300" style="height: 300px;"></canvas>
-                </div>
-              </div>
-            </div><!-- /.card-body -->
+      <div class="iq-card-body" style="padding-top:12px;">
+
+        <div class="proj-row" style="padding-top:0; border-bottom:2px solid var(--border);">
+          <span style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-soft);">Project</span>
+          <span style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-soft);">Progress</span>
+          <span style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-soft);">Status</span>
+          <span style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-soft);text-align:right;">Due</span>
+          <span></span>
+        </div>
+
+        {% for project in active_projects %}
+        <div class="proj-row">
+          <div>
+            <div class="proj-name">{{ project.name }}</div>
+            <div class="proj-meta">{{ project.project_number }} · {{ project.client.name }}</div>
           </div>
-          <!-- /.card -->
-
-          <!-- DIRECT CHAT -->
-          <div class="card direct-chat direct-chat-primary">
-            <div class="card-header">
-              <h3 class="card-title">Direct Chat</h3>
-
-              <div class="card-tools">
-                <span title="3 New Messages" class="badge badge-primary">3</span>
-                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                  <i class="fas fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-tool" title="Contacts" data-widget="chat-pane-toggle">
-                  <i class="fas fa-comments"></i>
-                </button>
-                <button type="button" class="btn btn-tool" data-card-widget="remove">
-                  <i class="fas fa-times"></i>
-                </button>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="iq-bar-track" style="flex:1;">
+                <div class="iq-bar-fill"
+                     style="width:{{ project.percent_complete }}%;
+                            background:{% if project.percent_complete >= 75 %}var(--green){% elif project.percent_complete >= 40 %}var(--teal){% else %}var(--blue){% endif %}">
+                </div>
               </div>
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-              <!-- Conversations are loaded here -->
-              <div class="direct-chat-messages">
-                <!-- Message. Default to the left -->
-                <div class="direct-chat-msg">
-                  <div class="direct-chat-infos clearfix">
-                    <span class="direct-chat-name float-left">Alexander Pierce</span>
-                    <span class="direct-chat-timestamp float-right">23 Jan 2:00 pm</span>
-                  </div>
-                  <!-- /.direct-chat-infos -->
-                  <img class="direct-chat-img" src="dist/img/user1-128x128.jpg" alt="message user image">
-                  <!-- /.direct-chat-img -->
-                  <div class="direct-chat-text">
-                    Is this template really for free? That's unbelievable!
-                  </div>
-                  <!-- /.direct-chat-text -->
-                </div>
-                <!-- /.direct-chat-msg -->
-
-                <!-- Message to the right -->
-                <div class="direct-chat-msg right">
-                  <div class="direct-chat-infos clearfix">
-                    <span class="direct-chat-name float-right">Sarah Bullock</span>
-                    <span class="direct-chat-timestamp float-left">23 Jan 2:05 pm</span>
-                  </div>
-                  <!-- /.direct-chat-infos -->
-                  <img class="direct-chat-img" src="dist/img/user3-128x128.jpg" alt="message user image">
-                  <!-- /.direct-chat-img -->
-                  <div class="direct-chat-text">
-                    You better believe it!
-                  </div>
-                  <!-- /.direct-chat-text -->
-                </div>
-                <!-- /.direct-chat-msg -->
-
-                <!-- Message. Default to the left -->
-                <div class="direct-chat-msg">
-                  <div class="direct-chat-infos clearfix">
-                    <span class="direct-chat-name float-left">Alexander Pierce</span>
-                    <span class="direct-chat-timestamp float-right">23 Jan 5:37 pm</span>
-                  </div>
-                  <!-- /.direct-chat-infos -->
-                  <img class="direct-chat-img" src="dist/img/user1-128x128.jpg" alt="message user image">
-                  <!-- /.direct-chat-img -->
-                  <div class="direct-chat-text">
-                    Working with AdminLTE on a great new app! Wanna join?
-                  </div>
-                  <!-- /.direct-chat-text -->
-                </div>
-                <!-- /.direct-chat-msg -->
-
-                <!-- Message to the right -->
-                <div class="direct-chat-msg right">
-                  <div class="direct-chat-infos clearfix">
-                    <span class="direct-chat-name float-right">Sarah Bullock</span>
-                    <span class="direct-chat-timestamp float-left">23 Jan 6:10 pm</span>
-                  </div>
-                  <!-- /.direct-chat-infos -->
-                  <img class="direct-chat-img" src="dist/img/user3-128x128.jpg" alt="message user image">
-                  <!-- /.direct-chat-img -->
-                  <div class="direct-chat-text">
-                    I would love to.
-                  </div>
-                  <!-- /.direct-chat-text -->
-                </div>
-                <!-- /.direct-chat-msg -->
-
-              </div>
-              <!--/.direct-chat-messages-->
-
-              <!-- Contacts are loaded here -->
-              <div class="direct-chat-contacts">
-                <ul class="contacts-list">
-                  <li>
-                    <a href="#">
-                      <img class="contacts-list-img" src="dist/img/user1-128x128.jpg" alt="User Avatar">
-
-                      <div class="contacts-list-info">
-                        <span class="contacts-list-name">
-                          Count Dracula
-                          <small class="contacts-list-date float-right">2/28/2015</small>
-                        </span>
-                        <span class="contacts-list-msg">How have you been? I was...</span>
-                      </div>
-                      <!-- /.contacts-list-info -->
-                    </a>
-                  </li>
-                  <!-- End Contact Item -->
-                  <li>
-                    <a href="#">
-                      <img class="contacts-list-img" src="dist/img/user7-128x128.jpg" alt="User Avatar">
-
-                      <div class="contacts-list-info">
-                        <span class="contacts-list-name">
-                          Sarah Doe
-                          <small class="contacts-list-date float-right">2/23/2015</small>
-                        </span>
-                        <span class="contacts-list-msg">I will be waiting for...</span>
-                      </div>
-                      <!-- /.contacts-list-info -->
-                    </a>
-                  </li>
-                  <!-- End Contact Item -->
-                  <li>
-                    <a href="#">
-                      <img class="contacts-list-img" src="dist/img/user3-128x128.jpg" alt="User Avatar">
-
-                      <div class="contacts-list-info">
-                        <span class="contacts-list-name">
-                          Nadia Jolie
-                          <small class="contacts-list-date float-right">2/20/2015</small>
-                        </span>
-                        <span class="contacts-list-msg">I'll call you back at...</span>
-                      </div>
-                      <!-- /.contacts-list-info -->
-                    </a>
-                  </li>
-                  <!-- End Contact Item -->
-                  <li>
-                    <a href="#">
-                      <img class="contacts-list-img" src="dist/img/user5-128x128.jpg" alt="User Avatar">
-
-                      <div class="contacts-list-info">
-                        <span class="contacts-list-name">
-                          Nora S. Vans
-                          <small class="contacts-list-date float-right">2/10/2015</small>
-                        </span>
-                        <span class="contacts-list-msg">Where is your new...</span>
-                      </div>
-                      <!-- /.contacts-list-info -->
-                    </a>
-                  </li>
-                  <!-- End Contact Item -->
-                  <li>
-                    <a href="#">
-                      <img class="contacts-list-img" src="dist/img/user6-128x128.jpg" alt="User Avatar">
-
-                      <div class="contacts-list-info">
-                        <span class="contacts-list-name">
-                          John K.
-                          <small class="contacts-list-date float-right">1/27/2015</small>
-                        </span>
-                        <span class="contacts-list-msg">Can I take a look at...</span>
-                      </div>
-                      <!-- /.contacts-list-info -->
-                    </a>
-                  </li>
-                  <!-- End Contact Item -->
-                  <li>
-                    <a href="#">
-                      <img class="contacts-list-img" src="dist/img/user8-128x128.jpg" alt="User Avatar">
-
-                      <div class="contacts-list-info">
-                        <span class="contacts-list-name">
-                          Kenneth M.
-                          <small class="contacts-list-date float-right">1/4/2015</small>
-                        </span>
-                        <span class="contacts-list-msg">Never mind I found...</span>
-                      </div>
-                      <!-- /.contacts-list-info -->
-                    </a>
-                  </li>
-                  <!-- End Contact Item -->
-                </ul>
-                <!-- /.contacts-list -->
-              </div>
-              <!-- /.direct-chat-pane -->
-            </div>
-            <!-- /.card-body -->
-            <div class="card-footer">
-              <form action="#" method="post">
-                <div class="input-group">
-                  <input type="text" name="message" placeholder="Type Message ..." class="form-control">
-                  <span class="input-group-append">
-                    <button type="button" class="btn btn-primary">Send</button>
-                  </span>
-                </div>
-              </form>
-            </div>
-            <!-- /.card-footer-->
-          </div>
-          <!--/.direct-chat -->
-
-          <!-- TO DO List -->
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">
-                <i class="ion ion-clipboard mr-1"></i>
-                To Do List
-              </h3>
-
-              <div class="card-tools">
-                <ul class="pagination pagination-sm">
-                  <li class="page-item"><a href="#" class="page-link">&laquo;</a></li>
-                  <li class="page-item"><a href="#" class="page-link">1</a></li>
-                  <li class="page-item"><a href="#" class="page-link">2</a></li>
-                  <li class="page-item"><a href="#" class="page-link">3</a></li>
-                  <li class="page-item"><a href="#" class="page-link">&raquo;</a></li>
-                </ul>
-              </div>
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-              <ul class="todo-list" data-widget="todo-list">
-                <li>
-                  <!-- drag handle -->
-                  <span class="handle">
-                    <i class="fas fa-ellipsis-v"></i>
-                    <i class="fas fa-ellipsis-v"></i>
-                  </span>
-                  <!-- checkbox -->
-                  <div  class="icheck-primary d-inline ml-2">
-                    <input type="checkbox" value="" name="todo1" id="todoCheck1">
-                    <label for="todoCheck1"></label>
-                  </div>
-                  <!-- todo text -->
-                  <span class="text">Design a nice theme</span>
-                  <!-- Emphasis label -->
-                  <small class="badge badge-danger"><i class="far fa-clock"></i> 2 mins</small>
-                  <!-- General tools such as edit or delete-->
-                  <div class="tools">
-                    <i class="fas fa-edit"></i>
-                    <i class="fas fa-trash-o"></i>
-                  </div>
-                </li>
-                <li>
-                  <span class="handle">
-                    <i class="fas fa-ellipsis-v"></i>
-                    <i class="fas fa-ellipsis-v"></i>
-                  </span>
-                  <div  class="icheck-primary d-inline ml-2">
-                    <input type="checkbox" value="" name="todo2" id="todoCheck2" checked>
-                    <label for="todoCheck2"></label>
-                  </div>
-                  <span class="text">Make the theme responsive</span>
-                  <small class="badge badge-info"><i class="far fa-clock"></i> 4 hours</small>
-                  <div class="tools">
-                    <i class="fas fa-edit"></i>
-                    <i class="fas fa-trash-o"></i>
-                  </div>
-                </li>
-                <li>
-                  <span class="handle">
-                    <i class="fas fa-ellipsis-v"></i>
-                    <i class="fas fa-ellipsis-v"></i>
-                  </span>
-                  <div  class="icheck-primary d-inline ml-2">
-                    <input type="checkbox" value="" name="todo3" id="todoCheck3">
-                    <label for="todoCheck3"></label>
-                  </div>
-                  <span class="text">Let theme shine like a star</span>
-                  <small class="badge badge-warning"><i class="far fa-clock"></i> 1 day</small>
-                  <div class="tools">
-                    <i class="fas fa-edit"></i>
-                    <i class="fas fa-trash-o"></i>
-                  </div>
-                </li>
-                <li>
-                  <span class="handle">
-                    <i class="fas fa-ellipsis-v"></i>
-                    <i class="fas fa-ellipsis-v"></i>
-                  </span>
-                  <div  class="icheck-primary d-inline ml-2">
-                    <input type="checkbox" value="" name="todo4" id="todoCheck4">
-                    <label for="todoCheck4"></label>
-                  </div>
-                  <span class="text">Let theme shine like a star</span>
-                  <small class="badge badge-success"><i class="far fa-clock"></i> 3 days</small>
-                  <div class="tools">
-                    <i class="fas fa-edit"></i>
-                    <i class="fas fa-trash-o"></i>
-                  </div>
-                </li>
-                <li>
-                  <span class="handle">
-                    <i class="fas fa-ellipsis-v"></i>
-                    <i class="fas fa-ellipsis-v"></i>
-                  </span>
-                  <div  class="icheck-primary d-inline ml-2">
-                    <input type="checkbox" value="" name="todo5" id="todoCheck5">
-                    <label for="todoCheck5"></label>
-                  </div>
-                  <span class="text">Check your messages and notifications</span>
-                  <small class="badge badge-primary"><i class="far fa-clock"></i> 1 week</small>
-                  <div class="tools">
-                    <i class="fas fa-edit"></i>
-                    <i class="fas fa-trash-o"></i>
-                  </div>
-                </li>
-                <li>
-                  <span class="handle">
-                    <i class="fas fa-ellipsis-v"></i>
-                    <i class="fas fa-ellipsis-v"></i>
-                  </span>
-                  <div  class="icheck-primary d-inline ml-2">
-                    <input type="checkbox" value="" name="todo6" id="todoCheck6">
-                    <label for="todoCheck6"></label>
-                  </div>
-                  <span class="text">Let theme shine like a star</span>
-                  <small class="badge badge-secondary"><i class="far fa-clock"></i> 1 month</small>
-                  <div class="tools">
-                    <i class="fas fa-edit"></i>
-                    <i class="fas fa-trash-o"></i>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <!-- /.card-body -->
-            <div class="card-footer clearfix">
-              <button type="button" class="btn btn-primary float-right"><i class="fas fa-plus"></i> Add item</button>
+              <span style="font-size:11px;font-weight:600;color:var(--text-soft);min-width:30px;">
+                {{ project.percent_complete }}%
+              </span>
             </div>
           </div>
-          <!-- /.card -->
-        </section>
-        <!-- /.Left col -->
-        <!-- right col (We are only adding the ID to make the widgets sortable)-->
-        <section class="col-lg-5 connectedSortable">
-
-          <!-- Map card -->
-          <div class="card bg-gradient-primary">
-            <div class="card-header border-0">
-              <h3 class="card-title">
-                <i class="fas fa-map-marker-alt mr-1"></i>
-                Visitors
-              </h3>
-              <!-- card tools -->
-              <div class="card-tools">
-                <button type="button" class="btn btn-primary btn-sm daterange" title="Date range">
-                  <i class="far fa-calendar-alt"></i>
-                </button>
-                <button type="button" class="btn btn-primary btn-sm" data-card-widget="collapse" title="Collapse">
-                  <i class="fas fa-minus"></i>
-                </button>
-              </div>
-              <!-- /.card-tools -->
-            </div>
-            <div class="card-body">
-              <div id="world-map" style="height: 250px; width: 100%;"></div>
-            </div>
-            <!-- /.card-body-->
-            <div class="card-footer bg-transparent">
-              <div class="row">
-                <div class="col-4 text-center">
-                  <div id="sparkline-1"></div>
-                  <div class="text-white">Visitors</div>
-                </div>
-                <!-- ./col -->
-                <div class="col-4 text-center">
-                  <div id="sparkline-2"></div>
-                  <div class="text-white">Online</div>
-                </div>
-                <!-- ./col -->
-                <div class="col-4 text-center">
-                  <div id="sparkline-3"></div>
-                  <div class="text-white">Sales</div>
-                </div>
-                <!-- ./col -->
-              </div>
-              <!-- /.row -->
-            </div>
+          <div>
+            <span class="status-pill {{ project.status }}">{{ project.get_status_display }}</span>
           </div>
-          <!-- /.card -->
-
-          <!-- solid sales graph -->
-          <div class="card bg-gradient-info">
-            <div class="card-header border-0">
-              <h3 class="card-title">
-                <i class="fas fa-th mr-1"></i>
-                Sales Graph
-              </h3>
-
-              <div class="card-tools">
-                <button type="button" class="btn bg-info btn-sm" data-card-widget="collapse">
-                  <i class="fas fa-minus"></i>
-                </button>
-                <button type="button" class="btn bg-info btn-sm" data-card-widget="remove">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-            </div>
-            <div class="card-body">
-              <canvas class="chart" id="line-chart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-            </div>
-            <!-- /.card-body -->
-            <div class="card-footer bg-transparent">
-              <div class="row">
-                <div class="col-4 text-center">
-                  <input type="text" class="knob" data-readonly="true" value="20" data-width="60" data-height="60"
-                         data-fgColor="#39CCCC">
-
-                  <div class="text-white">Mail-Orders</div>
-                </div>
-                <!-- ./col -->
-                <div class="col-4 text-center">
-                  <input type="text" class="knob" data-readonly="true" value="50" data-width="60" data-height="60"
-                         data-fgColor="#39CCCC">
-
-                  <div class="text-white">Online</div>
-                </div>
-                <!-- ./col -->
-                <div class="col-4 text-center">
-                  <input type="text" class="knob" data-readonly="true" value="30" data-width="60" data-height="60"
-                         data-fgColor="#39CCCC">
-
-                  <div class="text-white">In-Store</div>
-                </div>
-                <!-- ./col -->
-              </div>
-              <!-- /.row -->
-            </div>
-            <!-- /.card-footer -->
+          <div style="text-align:right;">
+            <span style="font-size:12px;font-weight:600;color:var(--text-base);">
+              {{ project.planned_end_date|date:"d M" }}
+            </span>
           </div>
-          <!-- /.card -->
-
-          <!-- Calendar -->
-          <div class="card bg-gradient-success">
-            <div class="card-header border-0">
-
-              <h3 class="card-title">
-                <i class="far fa-calendar-alt"></i>
-                Calendar
-              </h3>
-              <!-- tools card -->
-              <div class="card-tools">
-                <!-- button with a dropdown -->
-                <div class="btn-group">
-                  <button type="button" class="btn btn-success btn-sm dropdown-toggle" data-toggle="dropdown" data-offset="-52">
-                    <i class="fas fa-bars"></i>
-                  </button>
-                  <div class="dropdown-menu" role="menu">
-                    <a href="#" class="dropdown-item">Add new event</a>
-                    <a href="#" class="dropdown-item">Clear events</a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item">View calendar</a>
-                  </div>
-                </div>
-                <button type="button" class="btn btn-success btn-sm" data-card-widget="collapse">
-                  <i class="fas fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-success btn-sm" data-card-widget="remove">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-              <!-- /. tools -->
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body pt-0">
-              <!--The calendar -->
-              <div id="calendar" style="width: 100%"></div>
-            </div>
-            <!-- /.card-body -->
+          <div>
+            <a href="{% url 'project-details' project.pk %}"
+               class="btn btn-icon btn-xs btn-outline-light">
+              <em class="icon ni ni-chevron-right"></em>
+            </a>
           </div>
-          <!-- /.card -->
-        </section>
-        <!-- right col -->
+        </div>
+        {% empty %}
+        {% for i in "12345" %}
+        <div class="proj-row">
+          <div>
+            <div class="proj-name" style="width:{% cycle '160px' '130px' '180px' '145px' '120px' %};background:var(--muted);border-radius:4px;height:14px;"></div>
+            <div class="proj-meta" style="width:100px;background:var(--muted);border-radius:4px;height:10px;margin-top:5px;"></div>
+          </div>
+          <div>
+            <div class="iq-bar-track"><div class="iq-bar-fill" style="width:{% cycle '72' '45' '88' '33' '61' %}%;background:var(--teal);"></div></div>
+          </div>
+          <div>
+            <span class="status-pill {% cycle 'in_progress' 'planning' 'in_progress' 'on_hold' 'in_progress' %}">{% cycle 'In Progress' 'Planning' 'In Progress' 'On Hold' 'In Progress' %}</span>
+          </div>
+          <div style="text-align:right;font-size:12px;font-weight:600;color:var(--text-soft);">{% cycle '12 Jun' '30 Aug' '01 Apr' '15 Sep' '28 May' %}</div>
+          <div><button class="btn btn-icon btn-xs btn-outline-light"><em class="icon ni ni-chevron-right"></em></button></div>
+        </div>
+        {% endfor %}
+        {% endfor %}
+
       </div>
-      <!-- /.row (main row) -->
-    </div><!-- /.container-fluid -->
-</section>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     ROW 3 — Portfolio by Status + Performance Indices
+     ═══════════════════════════════════════════════════════════ -->
+<div class="row g-4 mb-4">
+
+  <!-- Portfolio by Status -->
+  <div class="col-12 col-md-6">
+    <div class="iq-card h-100">
+      <div class="iq-card-head">
+        <span class="iq-card-title">Portfolio by Status</span>
+      </div>
+      <div class="iq-card-body" style="display:flex;flex-direction:column;align-items:center;gap:20px;">
+
+        <div class="donut-wrap">
+          <svg viewBox="0 0 120 120" width="120" height="120">
+            <circle cx="60" cy="60" r="46"
+              fill="none" stroke="#EEF2FF" stroke-width="18"
+              stroke-dasharray="289" stroke-dashoffset="0"/>
+            <circle cx="60" cy="60" r="46"
+              fill="none" stroke="var(--teal)" stroke-width="18"
+              stroke-dasharray="289" stroke-dashoffset="0"
+              stroke-linecap="round"
+              transform="rotate(-90 60 60)"
+              style="stroke-dasharray:{{ in_progress_pct|default:'167' }} 289; stroke-dashoffset:0;"/>
+            <circle cx="60" cy="60" r="46"
+              fill="none" stroke="var(--amber)" stroke-width="18"
+              stroke-dasharray="289" stroke-dashoffset="0"
+              transform="rotate(-90 60 60)"
+              style="stroke-dasharray:{{ on_hold_pct|default:'29' }} 289; stroke-dashoffset:-{{ in_progress_pct|default:'167' }};"/>
+            <circle cx="60" cy="60" r="46"
+              fill="none" stroke="var(--blue)" stroke-width="18"
+              stroke-dasharray="289" stroke-dashoffset="0"
+              transform="rotate(-90 60 60)"
+              style="stroke-dasharray:{{ planning_pct|default:'58' }} 289; stroke-dashoffset:-{{ planning_offset|default:'196' }};"/>
+          </svg>
+          <div class="donut-label">
+            <span class="big">{{ total_projects_count|default:"18" }}</span>
+            <span class="sm">Projects</span>
+          </div>
+        </div>
+
+        <div style="width:100%;display:flex;flex-direction:column;gap:10px;">
+          {% for item in status_breakdown %}
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="legend-dot" style="background:{{ item.color }};"></span>
+            <span style="font-size:12.5px;font-weight:500;color:var(--text-base);flex:1;">{{ item.label }}</span>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--text-soft);">{{ item.count }}</span>
+            <span style="font-size:11px;color:var(--text-soft);min-width:32px;text-align:right;">{{ item.pct }}%</span>
+          </div>
+          {% empty %}
+          {% for row in "1234" %}
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="legend-dot" style="background:{% cycle 'var(--teal)' 'var(--blue)' 'var(--amber)' 'var(--green)' %};"></span>
+            <span style="font-size:12.5px;font-weight:500;color:var(--text-base);flex:1;">{% cycle 'In Progress' 'Planning' 'On Hold' 'Completed' %}</span>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--text-soft);">{% cycle '7' '4' '2' '5' %}</span>
+            <span style="font-size:11px;color:var(--text-soft);min-width:32px;text-align:right;">{% cycle '39%' '22%' '11%' '28%' %}</span>
+          </div>
+          {% endfor %}
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Performance Indices -->
+  <div class="col-12 col-md-6">
+    <div class="iq-card h-100">
+      <div class="iq-card-head">
+        <span class="iq-card-title">Performance Indices</span>
+        <span style="font-size:10px;color:var(--text-soft);">Avg across active</span>
+      </div>
+      <div class="iq-card-body" style="display:flex;flex-direction:column;gap:18px;">
+
+        {% for idx in performance_indices %}
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div class="index-ring">
+            <svg viewBox="0 0 80 80" width="80" height="80">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="var(--muted)" stroke-width="8"/>
+              <circle cx="40" cy="40" r="32" fill="none"
+                stroke="{{ idx.color }}" stroke-width="8"
+                stroke-linecap="round"
+                stroke-dasharray="{{ idx.dash }} 201"
+                stroke-dashoffset="0"/>
+            </svg>
+            <div class="ring-label">
+              <span class="val">{{ idx.value }}</span>
+              <span class="lbl">{{ idx.label }}</span>
+            </div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:var(--text-base);">{{ idx.title }}</div>
+            <div style="font-size:11px;color:var(--text-soft);margin-top:2px;line-height:1.4;">{{ idx.description }}</div>
+            <span class="stat-badge {{ idx.trend_class }}" style="margin-top:6px;">
+              <em class="icon ni ni-{{ idx.trend_icon }}"></em> {{ idx.trend_label }}
+            </span>
+          </div>
+        </div>
+        {% empty %}
+        <!-- Demo: SPI -->
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div class="index-ring">
+            <svg viewBox="0 0 80 80" width="80" height="80">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="var(--muted)" stroke-width="8"/>
+              <circle cx="40" cy="40" r="32" fill="none" stroke="var(--teal)" stroke-width="8"
+                stroke-linecap="round" stroke-dasharray="189 201" stroke-dashoffset="0"/>
+            </svg>
+            <div class="ring-label"><span class="val">0.94</span><span class="lbl">SPI</span></div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:var(--text-base);">Schedule Performance</div>
+            <div style="font-size:11px;color:var(--text-soft);margin-top:2px;line-height:1.4;">Slightly behind schedule across active portfolio.</div>
+            <span class="stat-badge down" style="margin-top:6px;"><em class="icon ni ni-arrow-down"></em> 0.03 vs last</span>
+          </div>
+        </div>
+        <!-- Demo: CPI -->
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div class="index-ring">
+            <svg viewBox="0 0 80 80" width="80" height="80">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="var(--muted)" stroke-width="8"/>
+              <circle cx="40" cy="40" r="32" fill="none" stroke="var(--green)" stroke-width="8"
+                stroke-linecap="round" stroke-dasharray="201 201" stroke-dashoffset="0"/>
+            </svg>
+            <div class="ring-label"><span class="val">1.02</span><span class="lbl">CPI</span></div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:var(--text-base);">Cost Performance</div>
+            <div style="font-size:11px;color:var(--text-soft);margin-top:2px;line-height:1.4;">Marginally under budget. On track overall.</div>
+            <span class="stat-badge up" style="margin-top:6px;"><em class="icon ni ni-arrow-up"></em> 0.05 vs last</span>
+          </div>
+        </div>
+        {% endfor %}
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     ROW 4 — Budget by Discipline + Activity Feed
+     ═══════════════════════════════════════════════════════════ -->
+<div class="row g-4 mb-4">
+
+  <!-- Budget burn per discipline -->
+  <div class="col-12 col-md-6">
+    <div class="iq-card h-100">
+      <div class="iq-card-head">
+        <span class="iq-card-title">Budget by Discipline</span>
+        <span style="font-size:10px;color:var(--text-soft);">Allocation vs spent</span>
+      </div>
+      <div class="iq-card-body" style="display:flex;flex-direction:column;gap:14px;">
+
+        {% for disc in discipline_budgets %}
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <span style="font-size:12.5px;font-weight:600;color:var(--text-base);">{{ disc.name }}</span>
+            <span style="font-family:var(--font-mono);font-size:11.5px;color:var(--text-soft);">
+              ${{ disc.spent_k }}k / ${{ disc.budget_k }}k
+            </span>
+          </div>
+          <div class="iq-bar-track">
+            <div class="iq-bar-fill"
+                 style="width:{{ disc.pct }}%;
+                        background:{% if disc.pct > 90 %}var(--red){% elif disc.pct > 75 %}var(--amber){% else %}var(--blue){% endif %};">
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        {% for d in "123456" %}
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <span style="font-size:12.5px;font-weight:600;color:var(--text-base);">{% cycle 'Civil Engineering' 'Architecture' 'Structural' 'Quantity Survey' 'Electrical' 'Mechanical' %}</span>
+            <span style="font-family:var(--font-mono);font-size:11.5px;color:var(--text-soft);">{% cycle '$420k / $580k' '$210k / $250k' '$180k / $200k' '$90k / $120k' '$310k / $400k' '$140k / $280k' %}</span>
+          </div>
+          <div class="iq-bar-track">
+            <div class="iq-bar-fill" style="width:{% cycle '72' '84' '90' '75' '78' '50' %}%;background:{% cycle 'var(--blue)' 'var(--amber)' 'var(--red)' 'var(--blue)' 'var(--blue)' 'var(--teal)' %};"></div>
+          </div>
+        </div>
+        {% endfor %}
+        {% endfor %}
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity feed -->
+  <div class="col-12 col-md-6">
+    <div class="iq-card h-100">
+      <div class="iq-card-head">
+        <span class="iq-card-title">Recent Activity</span>
+        <a href="#" class="btn btn-xs btn-outline-light">See all</a>
+      </div>
+      <div class="iq-card-body" style="padding-top:10px;">
+
+        {% for update in recent_updates %}
+        <div class="feed-item">
+          <div class="feed-avatar" style="background:{{ update.avatar_bg|default:'var(--blue-lt)' }};color:{{ update.avatar_color|default:'var(--blue)' }};">
+            {{ update.initials }}
+          </div>
+          <div>
+            <div class="feed-text">
+              <strong>{{ update.submitted_by.full_name }}</strong>
+              updated <strong>{{ update.task.name }}</strong>
+              — {{ update.value_achieved }}{% if update.task.measurement_type == 'percentage' %}%{% endif %}
+            </div>
+            <div class="feed-time">{{ update.date|timesince }} ago · {{ update.task.discipline.project.name }}</div>
+          </div>
+        </div>
+        {% empty %}
+        {% for f in "12345" %}
+        <div class="feed-item">
+          <div class="feed-avatar" style="background:{% cycle 'var(--blue-lt)' 'var(--teal-lt)' 'var(--green-lt)' 'var(--amber-lt)' 'var(--blue-lt)' %};color:{% cycle 'var(--blue)' 'var(--teal)' 'var(--green)' 'var(--amber)' 'var(--blue)' %};">
+            {% cycle 'TM' 'RL' 'KN' 'SP' 'AJ' %}
+          </div>
+          <div>
+            <div class="feed-text">
+              <strong>{% cycle 'T. Moyo' 'R. Langa' 'K. Ndlovu' 'S. Phiri' 'A. Jonga' %}</strong>
+              updated <strong>{% cycle 'Foundation Survey' 'Column Layout' 'Roof Truss Install' 'Drainage Design' 'Site Clearance' %}</strong>
+              — {% cycle '72%' '45 units' '88%' '120 m' '1 (done)' %}
+            </div>
+            <div class="feed-time">{% cycle '5 min' '1 hr' '3 hr' '1 day' '2 days' %} ago · {% cycle 'Harare CBD Tower' 'Bulawayo Mall' 'Mutare Road' 'Victoria Falls Hotel' 'Gweru Depot' %}</div>
+          </div>
+        </div>
+        {% endfor %}
+        {% endfor %}
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     ROW 5 — Upcoming Deadlines + Recent Expenses
+     ═══════════════════════════════════════════════════════════ -->
+<div class="row g-4 mb-4">
+
+  <!-- Upcoming milestones -->
+  <div class="col-12 col-md-6">
+    <div class="iq-card h-100">
+      <div class="iq-card-head">
+        <span class="iq-card-title">Upcoming Deadlines</span>
+        <span style="font-size:10px;color:var(--text-soft);">Next 60 days</span>
+      </div>
+      <div class="iq-card-body" style="padding-top:14px;">
+
+        {% for item in upcoming_deadlines %}
+        <div class="milestone-row">
+          <div class="milestone-dot {{ item.dot_class }}">
+            <em class="icon ni ni-{{ item.icon }}"></em>
+          </div>
+          <div>
+            <div class="milestone-name">{{ item.project_name }}</div>
+            <div class="milestone-dates">{{ item.label }} · Due {{ item.due_date|date:"d M Y" }}</div>
+          </div>
+          <span class="status-pill {{ item.status }}" style="margin-left:auto;">{{ item.days_remaining }}d</span>
+        </div>
+        {% empty %}
+        {% for m in "12345" %}
+        <div class="milestone-row">
+          <div class="milestone-dot {% cycle 'done' 'done' 'active' 'pending' 'pending' %}">
+            <em class="icon ni ni-{% cycle 'check' 'check' 'clock' 'calendar' 'calendar' %}"></em>
+          </div>
+          <div>
+            <div class="milestone-name">{% cycle 'Harare CBD Tower' 'Bulawayo Mall' 'Mutare Road Upgrade' 'Victoria Falls Hotel' 'Gweru Depot Phase 2' %}</div>
+            <div class="milestone-dates">{% cycle 'Baseline Locked' 'Foundations Complete' 'Superstructure Start' 'Roof Completion' 'Final Handover' %} · Due {% cycle '01 Feb 2025' '14 Feb 2025' '30 Mar 2025' '22 Apr 2025' '15 May 2025' %}</div>
+          </div>
+          <span class="status-pill {% cycle 'completed' 'completed' 'in_progress' 'planning' 'planning' %}" style="margin-left:auto;">
+            {% cycle '✓' '✓' '12d' '43d' '66d' %}
+          </span>
+        </div>
+        {% endfor %}
+        {% endfor %}
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Expenses -->
+  <div class="col-12 col-md-6">
+    <div class="iq-card h-100">
+      <div class="iq-card-head">
+        <span class="iq-card-title">Recent Expenses</span>
+      </div>
+      <div class="iq-card-body" style="padding-top:10px;">
+
+        {% for exp in recent_expenses %}
+        <div class="exp-row">
+          <div class="exp-cat"><em class="icon ni ni-coin-alt"></em></div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12.5px;font-weight:600;color:var(--text-base);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              {{ exp.category.name }}
+            </div>
+            <div style="font-size:11px;color:var(--text-soft);">{{ exp.project.name }}</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="exp-amount">${{ exp.amount|floatformat:2 }}</div>
+            <div style="font-size:10px;color:var(--text-soft);">{{ exp.expense_date|date:"d M" }}</div>
+          </div>
+          <span class="status-pill {% if exp.status == 'Confirmed' %}completed{% elif exp.status == 'Submitted' %}in_progress{% elif exp.status == 'Draft' %}planning{% else %}on_hold{% endif %}">
+            {{ exp.status }}
+          </span>
+        </div>
+        {% empty %}
+        {% for e in "12345" %}
+        <div class="exp-row">
+          <div class="exp-cat" style="background:{% cycle 'var(--amber-lt)' 'var(--blue-lt)' 'var(--teal-lt)' 'var(--red-lt)' 'var(--amber-lt)' %};color:{% cycle 'var(--amber)' 'var(--blue)' 'var(--teal)' 'var(--red)' 'var(--amber)' %};">
+            <em class="icon ni ni-{% cycle 'truck' 'tool' 'users' 'coin-alt' 'layers' %}"></em>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12.5px;font-weight:600;color:var(--text-base);">{% cycle 'Plant Hire' 'Materials' 'Labour' 'Subcontractor' 'Site Overhead' %}</div>
+            <div style="font-size:11px;color:var(--text-soft);">{% cycle 'Harare CBD Tower' 'Bulawayo Mall' 'Mutare Road' 'Victoria Falls Hotel' 'Gweru Depot' %}</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="exp-amount">{% cycle '$12,500' '$4,200' '$8,750' '$31,000' '$6,300' %}</div>
+            <div style="font-size:10px;color:var(--text-soft);">{% cycle '18 Mar' '17 Mar' '15 Mar' '14 Mar' '12 Mar' %}</div>
+          </div>
+          <span class="status-pill {% cycle 'completed' 'in_progress' 'planning' 'completed' 'on_hold' %}">
+            {% cycle 'Confirmed' 'Submitted' 'Draft' 'Confirmed' 'Reverted' %}
+          </span>
+        </div>
+        {% endfor %}
+        {% endfor %}
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
 {% endblock %}
