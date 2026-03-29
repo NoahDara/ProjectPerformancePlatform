@@ -32,7 +32,7 @@
       <tbody>
         {% for obj in disciplines %}
         <tr>
-          <td><a href="{% url 'discipline-detail' obj.pk %}">{{ obj.name }}</a></td>
+          <td><a href="">{{ obj.name }}</a></td>
           <td>{{ obj.code }}</td>
           <td>{{ obj.description|default:"-"|truncatechars:60 }}</td>
           <td>{{ obj.created|date:"Y-m-d" }}</td>

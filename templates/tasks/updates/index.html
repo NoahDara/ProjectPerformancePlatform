@@ -6,17 +6,15 @@
                 <th>Date</th>
                 <th>Value Achieved</th>
                 <th>Notes</th>
-                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for progress in task.updates.all %}
             <tr>
                 <td>{{ progress.submitted_by }}</td>
-                <td>{{ progress.submitted_by }}</td>
-                <td>{{ progress.submitted_by }}</td>
-                <td>{{ progress.submitted_by }}</td>
-                <td>{{ progress.submitted_by }}</td>
+                <td>{{ progress.date }}</td>
+                <td>{{ progress.value_achieved }}</td>
+                <td>{{ progress.notes }}</td>
             </tr>      
             {% endfor %}     
         </tbody>

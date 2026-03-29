@@ -5,7 +5,9 @@ from employees.models import Employee
 from projects.models import ProjectDiscipline
 from django.utils import timezone
 
-class Task(BaseModel):
+from roles.mixins import AutoPermissionMixin
+
+class Task(AutoPermissionMixin, BaseModel):
     MEASUREMENT_CHOICES = [
         ('percentage', 'Percentage (%)'),
         ('units', 'Units (e.g. piles, columns)'),

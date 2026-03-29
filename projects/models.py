@@ -2,9 +2,10 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from helpers.models import BaseModel
 from employees.models import Employee
+from roles.mixins import AutoPermissionMixin
 
 
-class Project(BaseModel):
+class Project(AutoPermissionMixin, BaseModel):
     PROJECT_TYPE_CHOICES = [
         ('residential', 'Residential'),
         ('commercial', 'Commercial'),

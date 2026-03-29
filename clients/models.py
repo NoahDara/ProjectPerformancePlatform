@@ -1,8 +1,9 @@
 from django.db import models
 from helpers.models import BaseModel
+from roles.mixins import AutoPermissionMixin
 
 
-class Client(BaseModel):
+class Client(AutoPermissionMixin, BaseModel):
     name = models.CharField(max_length=255)
     contact_person = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)

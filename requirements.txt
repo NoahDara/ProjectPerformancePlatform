@@ -28,5 +28,4 @@ stack-data==0.6.3
 traitlets==5.14.3
 wcwidth==0.6.0
 whitenoise==6.12.0
-
 # pip freeze | cut -d '=' -f 1

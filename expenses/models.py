@@ -5,12 +5,14 @@ from django.db.models import Q
 from helpers.models import BaseModel
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+
+from roles.mixins import AutoPermissionMixin
 User = get_user_model()
 from django.urls import reverse
 
 
 # Create your models here.
-class ExpenseCategory(BaseModel):
+class ExpenseCategory(AutoPermissionMixin, BaseModel):
     code = models.CharField(max_length=100, unique=True)
     name = models.CharField(max_length=100, unique=True)
     description = models.CharField(blank=True, null=True, max_length=255)
@@ -19,7 +21,7 @@ class ExpenseCategory(BaseModel):
     def __str__(self):
         return f"{self.name} - ({self.code})"
     
-class Expense(BaseModel):
+class Expense(AutoPermissionMixin, BaseModel):
     STATUS_CHOICES = [
         ('Draft', 'Draft'),
         ('Submitted', 'Submitted'),
